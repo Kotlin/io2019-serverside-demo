@@ -39,5 +39,3 @@ dependencies {
 }
 
 
-
-task run(dependsOn: appengineRun)
