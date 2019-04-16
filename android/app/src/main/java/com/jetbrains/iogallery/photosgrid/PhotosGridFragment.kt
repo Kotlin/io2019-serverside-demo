@@ -1,4 +1,4 @@
-package com.jetbrains.iogallery.list
+package com.jetbrains.iogallery.photosgrid
 
 import android.app.Activity
 import android.content.ClipData
@@ -24,16 +24,16 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.jetbrains.iogallery.ImagesViewModel
 import com.jetbrains.iogallery.R
-import com.jetbrains.iogallery.list.batch.BatchOperationDialogFragment
-import com.jetbrains.iogallery.list.batch.BatchOperationType
 import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.model.Photos
+import com.jetbrains.iogallery.photosgrid.batch.BatchOperationDialogFragment
+import com.jetbrains.iogallery.photosgrid.batch.BatchOperationType
 import com.jetbrains.iogallery.support.MarginItemDecoraton
 import com.jetbrains.iogallery.support.PrimaryActionModeCallback
-import kotlinx.android.synthetic.main.fragment_list.*
+import kotlinx.android.synthetic.main.fragment_photos_grid.*
 import timber.log.Timber
 
-class ListFragment : Fragment() {
+class PhotosGridFragment : Fragment() {
 
     private lateinit var viewModel: ImagesViewModel
 
@@ -41,7 +41,7 @@ class ListFragment : Fragment() {
     private var selectedItems: List<Photo> = emptyList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_list, container, false)
+        inflater.inflate(R.layout.fragment_photos_grid, container, false)
 
     private lateinit var photosAdapter: PhotosAdapter
 
@@ -162,7 +162,7 @@ class ListFragment : Fragment() {
 
     private fun onImagesPicked(imageUris: List<Uri>) {
         Timber.d("Images picked:\n${imageUris.joinToString(separator = "\n")}")
-        val directions = ListFragmentDirections.actionListFragmentToUploadFragment(imageUris.toTypedArray())
+        val directions = PhotosGridFragmentDirections.actionPhotosGridFragmentToUploadFragment(imageUris.toTypedArray())
         findNavController().navigate(directions)
     }
 

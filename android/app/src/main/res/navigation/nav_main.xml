@@ -3,22 +3,22 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
   android:id="@+id/nav_main"
-  app:startDestination="@id/listFragment">
+  app:startDestination="@id/photosGridFragment">
 
   <fragment
-    android:id="@+id/listFragment"
-    android:name="com.jetbrains.iogallery.list.ListFragment"
+    android:id="@+id/photosGridFragment"
+    android:name="com.jetbrains.iogallery.photosgrid.PhotosGridFragment"
     android:label="@string/gallery"
-    tools:layout="@layout/fragment_list">
+    tools:layout="@layout/fragment_photos_grid">
     <action
-      android:id="@+id/action_listFragment_to_detailFragment"
+      android:id="@+id/action_photosGridFragment_to_detailFragment"
       app:destination="@+id/detailFragment"
       app:enterAnim="@anim/nav_enter_anim"
       app:exitAnim="@anim/nav_exit_anim"
       app:popEnterAnim="@anim/nav_pop_enter_anim"
       app:popExitAnim="@anim/nav_pop_exit_anim" />
     <action
-      android:id="@+id/action_listFragment_to_uploadFragment"
+      android:id="@+id/action_photosGridFragment_to_uploadFragment"
       app:destination="@+id/uploadFragment"
       app:enterAnim="@anim/nav_enter_anim"
       app:exitAnim="@anim/nav_exit_anim"

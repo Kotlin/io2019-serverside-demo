@@ -62,7 +62,7 @@ class DeletionConfirmationDialogFragment : BottomSheetDialogFragment() {
         dialogResultImage.setImageResource(R.drawable.ic_check)
         dialogResultMessage.text = resources.getQuantityString(R.plurals.delete_result_blurb_success, 1)
 
-        findNavController().popBackStack(R.id.listFragment, false)
+        findNavController().popBackStack(R.id.photosGridFragment, false)
         dismissAfterDelay()
     }
 

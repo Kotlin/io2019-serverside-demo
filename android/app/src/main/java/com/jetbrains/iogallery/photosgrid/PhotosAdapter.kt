@@ -1,4 +1,4 @@
-package com.jetbrains.iogallery.list
+package com.jetbrains.iogallery.photosgrid
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -84,7 +84,7 @@ class PhotosAdapter(
     }
 
     private fun onItemClicked(photo: Photo) {
-        navController.navigate(ListFragmentDirections.actionListFragmentToDetailFragment(photo.id.rawId))
+        navController.navigate(PhotosGridFragmentDirections.actionPhotosGridFragmentToDetailFragment(photo.id.rawId))
     }
 
     private fun onItemLongClicked(photo: Photo, selected: Boolean) {

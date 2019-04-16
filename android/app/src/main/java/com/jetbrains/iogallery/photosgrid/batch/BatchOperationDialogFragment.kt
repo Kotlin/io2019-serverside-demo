@@ -1,4 +1,4 @@
-package com.jetbrains.iogallery.list.batch
+package com.jetbrains.iogallery.photosgrid.batch
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -134,7 +134,7 @@ class BatchOperationDialogFragment : BottomSheetDialogFragment() {
         }
         dialogResultGroup.isVisible = true
 
-        findNavController().popBackStack(R.id.listFragment, false)
+        findNavController().popBackStack(R.id.photosGridFragment, false)
         dismissAfterDelay()
     }
 

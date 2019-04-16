@@ -3,8 +3,8 @@
   <string name="action_settings">Settings</string>
   <string name="gallery">@string/app_name</string>
   <string name="uploading_images">Uploading images…</string>
-  <string name="list_empty_state_label">Nothing here yet, what about</string>
-  <string name="list_empty_state_cta">adding something?</string>
+  <string name="grid_empty_state_label">Nothing here yet, what about</string>
+  <string name="grid_empty_state_cta">adding something?</string>
   <string name="menu_delete_image">Delete image</string>
   <string name="menu_make_image_black_and_white">Make image black and white</string>
   <string name="upload_complete">Upload completed</string>

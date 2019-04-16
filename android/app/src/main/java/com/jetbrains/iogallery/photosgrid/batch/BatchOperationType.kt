@@ -1,4 +1,4 @@
-package com.jetbrains.iogallery.list.batch
+package com.jetbrains.iogallery.photosgrid.batch
 
 import java.io.Serializable
 
