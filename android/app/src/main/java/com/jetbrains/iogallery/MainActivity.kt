@@ -5,6 +5,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
+import com.jetbrains.iogallery.support.setupPicasso
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 
@@ -17,6 +18,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+
+        setupPicasso()
 
         setContentView(R.layout.activity_main)
         toolbar.title = getString(R.string.gallery)

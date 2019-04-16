@@ -11,7 +11,7 @@ import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import com.jetbrains.iogallery.R
 import com.jetbrains.iogallery.model.Photo
-import com.jetbrains.iogallery.support.picasso
+import com.squareup.picasso.Picasso
 import timber.log.Timber
 
 class PhotosAdapter(
@@ -74,7 +74,7 @@ class PhotosAdapter(
     }
 
     private fun loadImage(imageUrl: String, targetView: ImageView) {
-        targetView.context.picasso()
+        Picasso.get()
             .load(imageUrl.toUri())
             .fit()
             .centerCrop()

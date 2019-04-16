@@ -18,8 +18,8 @@ import com.jetbrains.iogallery.R
 import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.model.PhotoId
 import com.jetbrains.iogallery.model.Photos
-import com.jetbrains.iogallery.support.picasso
 import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_details.*
 import timber.log.Timber
 
@@ -95,7 +95,7 @@ class DetailFragment : Fragment() {
 
     private fun loadImage(imageUrl: String) {
         Timber.d("Loading image $imageUrl...")
-        detailImage.context.picasso()
+        Picasso.get()
             .load(imageUrl.toUri())
             .fit()
             .centerInside()
