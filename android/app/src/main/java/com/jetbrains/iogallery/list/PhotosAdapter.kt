@@ -75,7 +75,7 @@ class PhotosAdapter(
 
     private fun loadImage(imageUrl: String, targetView: ImageView) {
         targetView.context.picasso()
-            .load("$imageUrl?w=500&h=500&fm=webp".toUri())
+            .load(imageUrl.toUri())
             .fit()
             .centerCrop()
             .placeholder(R.drawable.loading_placeholder)

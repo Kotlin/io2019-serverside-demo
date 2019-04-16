@@ -105,7 +105,7 @@ class DetailFragment : Fragment() {
     private fun loadImage(imageUrl: String) {
         Timber.d("Loading image $imageUrl...")
         detailImage.context.picasso()
-            .load("$imageUrl?fm=webp".toUri()) // TODO this should be changed to a call to /image/{id}
+            .load(imageUrl.toUri())
             .fit()
             .centerInside()
             .error(R.drawable.broken_placeholder)
