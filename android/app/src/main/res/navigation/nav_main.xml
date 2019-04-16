@@ -31,9 +31,8 @@
     android:label="@string/gallery"
     tools:layout="@layout/fragment_details">
     <argument
-      android:name="id"
-      android:defaultValue="-1L"
-      app:argType="long" />
+      android:name="rawId"
+      app:argType="string" />
     <deepLink
       android:id="@+id/imageDetailsHttpsDeepLink"
       app:uri="io-gallery.com/image/{id}" />
@@ -63,8 +62,7 @@
     android:label="@string/gallery"
     tools:layout="@layout/fragment_deletion_confirmation" >
     <argument
-      android:name="id"
-      app:argType="long"
-      android:defaultValue="-1L" />
+      android:name="rawId"
+      app:argType="string" />
   </fragment>
 </navigation>

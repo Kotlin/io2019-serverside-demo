@@ -10,37 +10,40 @@ import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import com.jetbrains.iogallery.R
-import com.jetbrains.iogallery.model.ImageEntry
+import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.support.picasso
 import timber.log.Timber
 
-class ImageEntriesAdapter(
+class PhotosAdapter(
     context: Context,
     private val navController: NavController,
-    private val itemMultiSelectCallback: (selectedItems: List<ImageEntry>) -> Unit
-) : RecyclerView.Adapter<ImageEntriesAdapter.ImageEntryViewHolder>() {
+    private val itemMultiSelectCallback: (selectedItems: List<Photo>) -> Unit
+) : RecyclerView.Adapter<PhotosAdapter.PhotoViewHolder>() {
 
     private val layoutInflater = LayoutInflater.from(context)
 
-    private var items: List<Selectable<ImageEntry>> = emptyList()
+    private var items: List<Selectable<Photo>> = emptyList()
     private var isMultiSelecting: Boolean = false
 
     init {
         setHasStableIds(true)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageEntryViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
         val itemView = layoutInflater.inflate(R.layout.item_gallery_item, parent, false)
-        return ImageEntryViewHolder(itemView)
+        return PhotoViewHolder(itemView)
     }
 
     override fun getItemCount() = items.count()
 
-    override fun getItemId(position: Int) = items[position].item.id
+    // TODO: you should NEVER use hashcode as an item ID — clashes are too likely and it's very risky to do.
+    // You could get crashes (stableIDs must be unique)! In this case we're ok with it because there's a low
+    // amount of items, and all of them have UUIDs, which makes the risk of clashes low (but not zero)
+    override fun getItemId(position: Int) = items[position].item.id.hashCode().toLong()
 
-    override fun onBindViewHolder(holder: ImageEntryViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
         val item = items[position]
-        loadImage(item.item.url, holder.imageView)
+        loadImage(item.item.imageUrl, holder.imageView)
 
         holder.itemView.setOnClickListener {
             if (isMultiSelecting) {
@@ -70,14 +73,14 @@ class ImageEntriesAdapter(
             .into(targetView)
     }
 
-    private fun onItemClicked(item: ImageEntry) {
-        navController.navigate(ListFragmentDirections.actionListFragmentToDetailFragment(item.id))
+    private fun onItemClicked(photo: Photo) {
+        navController.navigate(ListFragmentDirections.actionListFragmentToDetailFragment(photo.id.rawId))
     }
 
-    private fun onItemLongClicked(item: ImageEntry, selected: Boolean) {
-        val changedIndex = items.indexOfFirst { it.item == item }
+    private fun onItemLongClicked(photo: Photo, selected: Boolean) {
+        val changedIndex = items.indexOfFirst { it.item == photo }
         if (changedIndex < 0) {
-            Timber.e("Item $item has been long pressed but I cannot find it!")
+            Timber.e("Item $photo has been long pressed but I cannot find it!")
             return
         }
 
@@ -94,7 +97,7 @@ class ImageEntriesAdapter(
         itemMultiSelectCallback(selectedItems.map { it.item })
     }
 
-    fun replaceItemsWith(items: List<ImageEntry>) {
+    fun replaceItemsWith(items: List<Photo>) {
         this.items = items.map { Selectable(it) }
         notifyDataSetChanged() // TODO use diffutils
     }
@@ -104,7 +107,7 @@ class ImageEntriesAdapter(
             .forEach { onItemLongClicked(it.item, false) }
     }
 
-    class ImageEntryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class PhotoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         val imageView = view.findViewById<ImageView>(R.id.itemImage)!!
         val checkImageView = view.findViewById<ImageView>(R.id.itemCheckedImage)!!

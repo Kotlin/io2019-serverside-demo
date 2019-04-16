@@ -31,7 +31,8 @@ import com.jetbrains.iogallery.debug.DebugPreferences
 import com.jetbrains.iogallery.debug.onDebugOptionsItemSelected
 import com.jetbrains.iogallery.list.batch.BatchOperationDialogFragment
 import com.jetbrains.iogallery.list.batch.BatchOperationType
-import com.jetbrains.iogallery.model.ImageEntry
+import com.jetbrains.iogallery.model.Photo
+import com.jetbrains.iogallery.model.Photos
 import com.jetbrains.iogallery.support.MarginItemDecoraton
 import com.jetbrains.iogallery.support.PrimaryActionModeCallback
 import com.jetbrains.iogallery.support.viewModelFactory
@@ -45,24 +46,24 @@ class ListFragment : Fragment() {
     private var currentApiServer: ApiServer = ApiServer.SWAGGER
 
     private val actionMode = PrimaryActionModeCallback()
-    private var selectedItems: List<ImageEntry> = emptyList()
+    private var selectedItems: List<Photo> = emptyList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_list, container, false)
 
-    private lateinit var imageEntriesAdapter: ImageEntriesAdapter
+    private lateinit var photosAdapter: PhotosAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         emptyText2.setOnClickListener { onAddImagesClicked() }
         fab.setOnClickListener { onAddImagesClicked() }
 
         val navController = findNavController()
-        imageEntriesAdapter = ImageEntriesAdapter(requireActivity(), navController, ::onItemMultiselectChanged)
+        photosAdapter = PhotosAdapter(requireActivity(), navController, ::onItemMultiselectChanged)
         actionMode.onActionItemClickListener = ::onActionModeItemClicked
         actionMode.onActionModeFinishedListener = ::finishActionMode
 
         recyclerView.layoutManager = GridLayoutManager(view.context, 2).apply { orientation = VERTICAL }
-        recyclerView.adapter = imageEntriesAdapter
+        recyclerView.adapter = photosAdapter
         recyclerView.setHasFixedSize(true)
         recyclerView.addItemDecoration(MarginItemDecoraton(view.resources.getDimensionPixelSize(R.dimen.grid_images_margin)))
 
@@ -100,10 +101,10 @@ class ListFragment : Fragment() {
 
     private fun startBatchOperation(operation: BatchOperationType) {
         val dialog = BatchOperationDialogFragment()
-        val selectedIds = selectedItems.map { it.id }.toLongArray()
+        val selectedIds = selectedItems.map { it.id.rawId }.toTypedArray()
 
         dialog.arguments = Bundle().also {
-            it.putLongArray(BatchOperationDialogFragment.ARG_IDS, selectedIds)
+            it.putStringArray(BatchOperationDialogFragment.ARG_IDS, selectedIds)
             it.putSerializable(BatchOperationDialogFragment.ARG_OPERATION_TYPE, operation)
         }
         val supportFragmentManager = requireActivity().supportFragmentManager
@@ -121,7 +122,7 @@ class ListFragment : Fragment() {
         viewModel.fetchImageEntries()
     }
 
-    private fun onItemMultiselectChanged(newSelectedItems: List<ImageEntry>) {
+    private fun onItemMultiselectChanged(newSelectedItems: List<Photo>) {
         when {
             newSelectedItems.isEmpty() && selectedItems.isNotEmpty() -> finishActionMode()
             newSelectedItems.isNotEmpty() && selectedItems.isEmpty() -> startActionMode()
@@ -145,7 +146,7 @@ class ListFragment : Fragment() {
 
         actionMode.finishActionMode()
         selectedItems = emptyList()
-        imageEntriesAdapter.cancelMultiselect()
+        photosAdapter.cancelMultiselect()
 
         fab.animate()
             .scaleX(1f)
@@ -177,14 +178,14 @@ class ListFragment : Fragment() {
         findNavController().navigate(directions)
     }
 
-    private fun onImagesListChanged(list: List<ImageEntry>) {
+    private fun onImagesListChanged(photos: Photos) {
         progressBar.isVisible = false
         fab.isVisible = true
-        if (list.isNotEmpty()) {
-            showEmptyState(false)
-            imageEntriesAdapter.replaceItemsWith(list)
-        } else {
+        if (photos.isEmpty) {
             showEmptyState(true)
+        } else {
+            showEmptyState(false)
+            photosAdapter.replaceItemsWith(photos.photos)
         }
     }
 

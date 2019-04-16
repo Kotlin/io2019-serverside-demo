@@ -72,8 +72,8 @@ class UploadViewModel(private val apiServerProvider: () -> ApiServer) : ViewMode
         val imageBody = RequestBody.create(mediaType, inputStream.readBytes())
         val fileName = uri.getFileName(contentResolver) ?: "no-image-name"
 
-        return uploadImage(
-            imageFile = MultipartBody.Part.createFormData("file", fileName, imageBody)
+        return uploadPhoto(
+            photo = MultipartBody.Part.createFormData("file", fileName, imageBody)
         )
     }
 

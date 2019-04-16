@@ -16,7 +16,7 @@ import com.jetbrains.iogallery.ImagesViewModel
 import com.jetbrains.iogallery.R
 import com.jetbrains.iogallery.api.ApiServer
 import com.jetbrains.iogallery.debug.DebugPreferences
-import com.jetbrains.iogallery.support.requiredLongArgument
+import com.jetbrains.iogallery.support.requiredPhotoIdFromRawString
 import com.jetbrains.iogallery.support.viewModelFactory
 import kotlinx.android.synthetic.main.fragment_deletion_confirmation.*
 import timber.log.Timber
@@ -27,7 +27,7 @@ class DeletionConfirmationDialogFragment : BottomSheetDialogFragment() {
     private lateinit var debugPreferences: DebugPreferences
 
     private var currentApiServer: ApiServer = ApiServer.SWAGGER
-    private val id: Long by requiredLongArgument(ARG_ID)
+    private val id by requiredPhotoIdFromRawString(ARG_ID)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         inflater.inflate(R.layout.fragment_deletion_confirmation, container, false)!!

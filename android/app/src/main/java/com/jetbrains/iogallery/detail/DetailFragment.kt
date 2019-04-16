@@ -1,6 +1,5 @@
 package com.jetbrains.iogallery.detail
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -18,7 +17,9 @@ import com.jetbrains.iogallery.ImagesViewModel
 import com.jetbrains.iogallery.R
 import com.jetbrains.iogallery.api.ApiServer
 import com.jetbrains.iogallery.debug.DebugPreferences
-import com.jetbrains.iogallery.model.ImageEntry
+import com.jetbrains.iogallery.model.Photo
+import com.jetbrains.iogallery.model.PhotoId
+import com.jetbrains.iogallery.model.Photos
 import com.jetbrains.iogallery.support.picasso
 import com.jetbrains.iogallery.support.viewModelFactory
 import com.squareup.picasso.Callback
@@ -32,6 +33,7 @@ class DetailFragment : Fragment() {
 
     private var currentApiServer: ApiServer = ApiServer.SWAGGER
     private val args: DetailFragmentArgs by navArgs()
+    private val photoId get() = PhotoId(args.rawId)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         inflater.inflate(R.layout.fragment_details, container, false)!!
@@ -54,17 +56,16 @@ class DetailFragment : Fragment() {
         fab.setOnClickListener { onCategorizeImageClicked() }
     }
 
-    @SuppressLint("Range") // This is a bug in the Lint check — it's flagging the default value of args.id
     private fun onCategorizeImageClicked() {
         detailImage.animate().alpha(.75f)
-        viewModel.categorizeImage(args.id)
+        viewModel.categorizeImage(photoId)
             .observe(this, Observer { result ->
                 if (result.isSuccess) {
-                    Timber.i("Image ${args.id} categorised successfully, reloading data.")
+                    Timber.i("Image $photoId categorised successfully, reloading data.")
                     loadImageData()
                 } else {
                     detailImage.animate().alpha(1f)
-                    val errorMessage = "Error while categorising image ${args.id}"
+                    val errorMessage = "Error while categorising image $photoId"
                     Timber.e(result.exceptionOrNull()!!, "Ruh roh! $errorMessage")
                     Snackbar.make(detailsRoot, errorMessage, Snackbar.LENGTH_LONG).show()
                 }
@@ -77,19 +78,18 @@ class DetailFragment : Fragment() {
         viewModel.fetchImageEntries()
     }
 
-    private fun onImagesListChanged(list: List<ImageEntry>) {
-        val imageEntry = list.first { it.id == args.id }
+    private fun onImagesListChanged(photos: Photos) {
+        val photo = photos[photoId]
 
         val shouldAnimate = !imageLabel.isVisible
-        updateImageLabelView(imageEntry, shouldAnimate)
+        updateImageLabelView(photo, shouldAnimate)
 
-        val imageUrl = imageEntry.url
-        loadImage(imageUrl)
+        loadImage(photo.imageUrl)
     }
 
-    private fun updateImageLabelView(imageEntry: ImageEntry, shouldAnimate: Boolean) {
-        if (imageEntry.label != null) {
-            imageLabel.text = imageEntry.label
+    private fun updateImageLabelView(photo: Photo, shouldAnimate: Boolean) {
+        if (photo.label != null) {
+            imageLabel.text = photo.label
             imageLabel.isVisible = true
 
             if (shouldAnimate) {
@@ -127,31 +127,31 @@ class DetailFragment : Fragment() {
 
     private fun onBottomToolbarMenuItemClicked(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_delete -> onDeleteClicked(args.id)
-            R.id.menu_b_and_w -> onBlackAndWhiteClicked(args.id)
+            R.id.menu_delete -> onDeleteClicked(photoId)
+            R.id.menu_b_and_w -> onBlackAndWhiteClicked(photoId)
             else -> return false
         }
         return true
     }
 
-    private fun onDeleteClicked(id: Long) {
+    private fun onDeleteClicked(id: PhotoId) {
         val dialog = DeletionConfirmationDialogFragment()
-        dialog.arguments = Bundle().also { it.putLong(DeletionConfirmationDialogFragment.ARG_ID, id) }
+        dialog.arguments = Bundle().also { it.putString(DeletionConfirmationDialogFragment.ARG_ID, id.rawId) }
         dialog.showNow(requireActivity().supportFragmentManager, "CONFIRMATION")
     }
 
-    private fun onBlackAndWhiteClicked(id: Long) {
+    private fun onBlackAndWhiteClicked(id: PhotoId) {
         detailImage.animate().alpha(.75f)
         viewModel.makeImageBlackAndWhite(id)
             .observe(this, Observer { result ->
                 if (result.isSuccess) {
-                    Timber.i("Image ${args.id} desaturated successfully, reloading data.")
+                    Timber.i("Image $photoId desaturated successfully, reloading data.")
                     Snackbar.make(detailsRoot, "Image successfully converted to black & white", Snackbar.LENGTH_SHORT).show()
                     loadImageData()
                 } else {
                     detailImage.animate().alpha(1f)
                     val errorMessage = "Error while hipstering image"
-                    Timber.e(result.exceptionOrNull()!!, "Ruh roh! $errorMessage ${args.id}")
+                    Timber.e(result.exceptionOrNull()!!, "Ruh roh! $errorMessage $photoId")
                     Snackbar.make(detailsRoot, errorMessage, Snackbar.LENGTH_LONG).show()
                 }
             })

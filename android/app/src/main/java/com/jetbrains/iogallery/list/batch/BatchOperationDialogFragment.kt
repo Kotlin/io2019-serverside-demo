@@ -16,7 +16,8 @@ import com.jetbrains.iogallery.ImagesViewModel
 import com.jetbrains.iogallery.R
 import com.jetbrains.iogallery.api.ApiServer
 import com.jetbrains.iogallery.debug.DebugPreferences
-import com.jetbrains.iogallery.support.requiredLongArrayArgument
+import com.jetbrains.iogallery.model.PhotoId
+import com.jetbrains.iogallery.support.requiredPhotoIdsFromRawStringArray
 import com.jetbrains.iogallery.support.requiredSerializableArgument
 import com.jetbrains.iogallery.support.viewModelFactory
 import kotlinx.android.synthetic.main.fragment_batch.*
@@ -30,10 +31,10 @@ class BatchOperationDialogFragment : BottomSheetDialogFragment() {
 
     private var currentApiServer: ApiServer = ApiServer.SWAGGER
 
-    private val ids: LongArray by requiredLongArrayArgument(ARG_IDS)
+    private val ids by requiredPhotoIdsFromRawStringArray(ARG_IDS)
     private val operationType: BatchOperationType by requiredSerializableArgument(ARG_OPERATION_TYPE)
     private val pendingOperations = AtomicInteger()
-    private val failedIds = mutableListOf<Long>()
+    private val failedIds = mutableListOf<PhotoId>()
 
     var onDismissListener: (() -> Unit)? = null
 
@@ -83,12 +84,12 @@ class BatchOperationDialogFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun onImageDeleted(id: Long) {
+    private fun onImageDeleted(id: PhotoId) {
         Timber.i("Image $id deleted successfully.")
         onImageProcessed()
     }
 
-    private fun onDeleteFailure(id: Long, result: Result<Unit>) {
+    private fun onDeleteFailure(id: PhotoId, result: Result<Unit>) {
         Timber.e(result.exceptionOrNull()!!, "Ruh roh! Error while deleting image $id")
         failedIds += id
         onImageProcessed()
@@ -113,12 +114,12 @@ class BatchOperationDialogFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun onImageConverted(id: Long) {
+    private fun onImageConverted(id: PhotoId) {
         Timber.i("Image $id converted successfully.")
         onImageProcessed()
     }
 
-    private fun onConversionFailure(id: Long, result: Result<Unit>) {
+    private fun onConversionFailure(id: PhotoId, result: Result<Unit>) {
         Timber.e(result.exceptionOrNull()!!, "Ruh roh! Error while converting image $id")
         failedIds += id
         onImageProcessed()
