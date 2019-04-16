@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.net.toUri
-import androidx.core.view.isVisible
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import com.jetbrains.iogallery.R
@@ -57,10 +57,20 @@ class PhotosAdapter(
             true
         }
 
-        holder.itemView.isSelected = item.selected
-        holder.checkImageView.isVisible = item.selected
-        holder.imageView.scaleX = if (item.selected) .9f else 1f
-        holder.imageView.scaleY = if (item.selected) .9f else 1f
+        holder.isSelected = item.selected
+    }
+
+    override fun onBindViewHolder(holder: PhotoViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isNotEmpty()) {
+            val whatChanged = payloads.firstOrNull { it is WhatChanged } as WhatChanged?
+            if (whatChanged == null) {
+                super.onBindViewHolder(holder, position, payloads)
+            } else {
+                holder.isSelected = whatChanged.selected
+            }
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
     }
 
     private fun loadImage(imageUrl: String, targetView: ImageView) {
@@ -90,7 +100,7 @@ class PhotosAdapter(
             items[changedIndex].copy(selected = selected) +
             items.takeLast(countAfterChanged)
 
-        notifyItemChanged(changedIndex, WhatChanged(selected = true))    // TODO use payload!
+        notifyItemChanged(changedIndex, WhatChanged(selected = selected))
 
         val selectedItems = items.filter { it.selected }
         isMultiSelecting = selectedItems.isNotEmpty()
@@ -109,11 +119,42 @@ class PhotosAdapter(
 
     class PhotoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
+        var isSelected: Boolean = false
+            set(value) {
+                field = value
+                itemView.isSelected = value
+
+                setSelectedUiState(value)
+            }
+
+        private fun setSelectedUiState(selected: Boolean) {
+            if (itemView.isAttachedToWindow) {
+                imageView.animate()
+                    .setInterpolator(FastOutSlowInInterpolator())
+                    .scaleX(if (selected) .9f else 1f)
+                    .scaleY(if (selected) .9f else 1f)
+                    .duration = SELECTION_ANIMATION_DURATION_MS
+
+                checkImageView.animate()
+                    .alpha(if (selected) 1f else 0f)
+                    .duration = SELECTION_ANIMATION_DURATION_MS
+            } else {
+                imageView.scaleX = if (selected) .9f else 1f
+                imageView.scaleY = if (selected) .9f else 1f
+                checkImageView.alpha = if (selected) 1f else 0f
+            }
+        }
+
         val imageView = view.findViewById<ImageView>(R.id.itemImage)!!
-        val checkImageView = view.findViewById<ImageView>(R.id.itemCheckedImage)!!
+
+        private val checkImageView = view.findViewById<ImageView>(R.id.itemCheckedImage)!!
     }
 
     private data class Selectable<T>(val item: T, val selected: Boolean = false)
 
     private data class WhatChanged(val selected: Boolean = false)
+
+    companion object {
+        const val SELECTION_ANIMATION_DURATION_MS = 100L
+    }
 }

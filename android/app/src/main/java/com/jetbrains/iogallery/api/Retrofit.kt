@@ -71,17 +71,17 @@ private class LiveDataCallAdapter<R>(private val responseType: Type) : CallAdapt
 private object LiveDataCallAdapterFactory : CallAdapter.Factory() {
 
     override fun get(returnType: Type, annotations: Array<Annotation>, retrofit: Retrofit): CallAdapter<*, *>? {
-        if (CallAdapter.Factory.getRawType(returnType) != LiveData::class.java) {
+        if (getRawType(returnType) != LiveData::class.java) {
             return null
         }
 
-        val observableType = CallAdapter.Factory.getParameterUpperBound(0, returnType as ParameterizedType)
-        val rawObservableType = CallAdapter.Factory.getRawType(observableType)
+        val observableType = getParameterUpperBound(0, returnType as ParameterizedType)
+        val rawObservableType = getRawType(observableType)
         if (rawObservableType != Result::class.java || observableType !is ParameterizedType) {
             throw IllegalArgumentException("Return type must be a Result<T>")
         }
 
-        val bodyType = CallAdapter.Factory.getParameterUpperBound(0, observableType)
+        val bodyType = getParameterUpperBound(0, observableType)
         return LiveDataCallAdapter<Any>(bodyType)
     }
 }
