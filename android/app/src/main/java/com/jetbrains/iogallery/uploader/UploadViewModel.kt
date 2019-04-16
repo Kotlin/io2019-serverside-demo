@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModel
 import com.jetbrains.iogallery.api.ImagesBackend
 import com.jetbrains.iogallery.api.UploadException
 import com.jetbrains.iogallery.api.retrofit
-import com.jetbrains.iogallery.model.UploadResult
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -60,9 +59,9 @@ class UploadViewModel : ViewModel() {
         return liveData
     }
 
-    private fun ImagesBackend.uploadImage(contentResolver: ContentResolver, uri: Uri): LiveData<Result<UploadResult>> {
+    private fun ImagesBackend.uploadImage(contentResolver: ContentResolver, uri: Uri): LiveData<Result<Unit>> {
         val inputStream = contentResolver.openInputStream(uri)
-            ?: return MutableLiveData<Result<UploadResult>>().also {
+            ?: return MutableLiveData<Result<Unit>>().also {
                 it.postValue(Result.failure(UploadException("Unable to access content at $uri")))
             }
 

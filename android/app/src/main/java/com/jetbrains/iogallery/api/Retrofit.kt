@@ -27,8 +27,10 @@ private val okHttpClient = OkHttpClient.Builder()
     }
     .build()
 
+const val BASE_URI = "https://cloud-kotlin-io19.appspot.com/"
+
 fun retrofit(): Retrofit = Retrofit.Builder()
-    .baseUrl("https://cloud-kotlin-io19.appspot.com/")
+    .baseUrl(BASE_URI)
     .client(okHttpClient)
     .addConverterFactory(GsonConverterFactory.create())
     .addCallAdapterFactory(LiveDataCallAdapterFactory)

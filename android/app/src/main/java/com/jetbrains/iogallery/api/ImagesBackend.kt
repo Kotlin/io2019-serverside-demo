@@ -2,7 +2,6 @@ package com.jetbrains.iogallery.api
 
 import androidx.lifecycle.LiveData
 import com.jetbrains.iogallery.model.ApiPhotos
-import com.jetbrains.iogallery.model.UploadResult
 import okhttp3.MultipartBody
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -19,7 +18,7 @@ interface ImagesBackend {
 
     @Multipart
     @POST("upload")
-    fun uploadPhoto(@Part photo: MultipartBody.Part): LiveData<Result<UploadResult>>
+    fun uploadPhoto(@Part photo: MultipartBody.Part): LiveData<Result<Unit>>
 
     @DELETE("image/{id}")
     fun deleteImage(@Path("id") id: String): LiveData<Result<Unit>>
