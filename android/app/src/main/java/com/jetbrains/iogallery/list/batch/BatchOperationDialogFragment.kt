@@ -1,0 +1,173 @@
+package com.jetbrains.iogallery.list.batch
+
+import android.annotation.SuppressLint
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.jetbrains.iogallery.ImagesViewModel
+import com.jetbrains.iogallery.R
+import com.jetbrains.iogallery.api.ApiServer
+import com.jetbrains.iogallery.debug.DebugPreferences
+import com.jetbrains.iogallery.support.requiredLongArrayArgument
+import com.jetbrains.iogallery.support.requiredSerializableArgument
+import com.jetbrains.iogallery.support.viewModelFactory
+import kotlinx.android.synthetic.main.fragment_batch.*
+import timber.log.Timber
+import java.util.concurrent.atomic.AtomicInteger
+
+class BatchOperationDialogFragment : BottomSheetDialogFragment() {
+
+    private lateinit var viewModel: ImagesViewModel
+    private lateinit var debugPreferences: DebugPreferences
+
+    private var currentApiServer: ApiServer = ApiServer.SWAGGER
+
+    private val ids: LongArray by requiredLongArrayArgument(ARG_IDS)
+    private val operationType: BatchOperationType by requiredSerializableArgument(ARG_OPERATION_TYPE)
+    private val pendingOperations = AtomicInteger()
+    private val failedIds = mutableListOf<Long>()
+
+    var onDismissListener: (() -> Unit)? = null
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
+        inflater.inflate(R.layout.fragment_batch, container, false)!!
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        debugPreferences = DebugPreferences(requireActivity())
+        debugPreferences.subscribeToApiServer(this) { apiServer -> currentApiServer = apiServer }
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory { ImagesViewModel { currentApiServer } })
+            .get(ImagesViewModel::class.java)
+
+        pendingOperations.set(ids.count())
+        when (operationType) {
+            BatchOperationType.DELETE -> askConfirmationForBatchDelete()
+            BatchOperationType.BLACK_AND_WHITE -> makeImagesBlackAndWhite()
+        }
+        cancelButton.setOnClickListener { dismiss() }
+    }
+
+    private fun askConfirmationForBatchDelete() {
+        confirmButton.setOnClickListener { onDeleteConfirmed() }
+        dialogTitle.setText(R.string.delete_confirmation_title)
+        dialogMessage.text = resources.getQuantityString(R.plurals.delete_confirmation_blurb, ids.size)
+    }
+
+    @SuppressLint("Range") // This is a bug in the Lint check — it's flagging the default value of args.id
+    private fun onDeleteConfirmed() {
+        isCancelable = false
+        requireView().isEnabled = false
+        dialogConfirmationGroup.isInvisible = true
+        progressBar.isInvisible = false
+
+        ids.forEach { id ->
+            Timber.d("Deleting image $id...")
+            viewModel.deleteImage(id)
+                .observe(this, Observer { result ->
+                    if (result.isSuccess) {
+                        onImageDeleted(id)
+                    } else {
+                        onDeleteFailure(id, result)
+                    }
+                })
+        }
+    }
+
+    private fun onImageDeleted(id: Long) {
+        Timber.i("Image $id deleted successfully.")
+        onImageProcessed()
+    }
+
+    private fun onDeleteFailure(id: Long, result: Result<Unit>) {
+        Timber.e(result.exceptionOrNull()!!, "Ruh roh! Error while deleting image $id")
+        failedIds += id
+        onImageProcessed()
+    }
+
+    private fun makeImagesBlackAndWhite() {
+        isCancelable = false
+        requireView().isEnabled = false
+        dialogConfirmationGroup.isInvisible = true
+        progressBar.isInvisible = false
+
+        ids.forEach { id ->
+            Timber.d("Converting image $id to B&W...")
+            viewModel.makeImageBlackAndWhite(id)
+                .observe(this, Observer { result ->
+                    if (result.isSuccess) {
+                        onImageConverted(id)
+                    } else {
+                        onConversionFailure(id, result)
+                    }
+                })
+        }
+    }
+
+    private fun onImageConverted(id: Long) {
+        Timber.i("Image $id converted successfully.")
+        onImageProcessed()
+    }
+
+    private fun onConversionFailure(id: Long, result: Result<Unit>) {
+        Timber.e(result.exceptionOrNull()!!, "Ruh roh! Error while converting image $id")
+        failedIds += id
+        onImageProcessed()
+    }
+
+    private fun onImageProcessed() {
+        val remainingOperationsCount = pendingOperations.decrementAndGet()
+        if (remainingOperationsCount == 0) showCompletionUI()
+    }
+
+    private fun showCompletionUI() {
+        Timber.i("All done! Batch operation ${operationType.name} completed. Failed ${failedIds.size} out of ${ids.size}")
+        progressBar.isInvisible = true
+
+        val hadFailures = failedIds.isNotEmpty()
+        if (hadFailures) {
+            dialogResultImage.setImageResource(R.drawable.ic_error)
+            dialogResultMessage.text = getErrorText(failedIds.count())
+        } else {
+            dialogResultImage.setImageResource(R.drawable.ic_check)
+            dialogResultMessage.text = getSuccessText(ids.size)
+        }
+        dialogResultGroup.isVisible = true
+
+        findNavController().popBackStack(R.id.listFragment, false)
+        dismissAfterDelay()
+    }
+
+    private fun getErrorText(failedCount: Int) = when (operationType) {
+        BatchOperationType.DELETE -> resources.getQuantityString(R.plurals.delete_result_blurb_error, failedCount, failedCount)
+        BatchOperationType.BLACK_AND_WHITE -> resources.getQuantityString(R.plurals.b_and_w_result_blurb_error, failedCount)
+    }
+
+    private fun getSuccessText(imagesCount: Int) = when (operationType) {
+        BatchOperationType.DELETE -> resources.getQuantityString(R.plurals.delete_result_blurb_success, imagesCount, imagesCount)
+        BatchOperationType.BLACK_AND_WHITE -> resources.getQuantityString(R.plurals.b_and_w_result_blurb_success, imagesCount)
+    }
+
+    private fun dismissAfterDelay() {
+        dialogResultGroup.postDelayed(1500) { dismiss() }
+    }
+
+    override fun dismiss() {
+        super.dismiss()
+        onDismissListener?.invoke()
+    }
+
+    companion object {
+        val ARG_IDS = "${this::class.java.name}.ARG_IDS"
+        val ARG_OPERATION_TYPE = "${this::class.java.name}.ARG_OPERATION_TYPE"
+    }
+}

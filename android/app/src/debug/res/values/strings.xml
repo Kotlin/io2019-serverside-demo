@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="debug_menu_select_server">Select server</string>
+  <string name="select_api_server">Select API server</string>
+  <string name="server_swagger">Swagger mock</string>
+  <string name="server_gcp">GCP (prod)</string>
+  <string name="dialog_positive_ok">OK</string>
+  <string name="dialog_negative_cancel">Cancel</string>
+</resources>

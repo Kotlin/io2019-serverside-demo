@@ -1,0 +1,37 @@
+<resources>
+
+  <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <item name="colorPrimary">@color/primaryColor</item>
+    <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+    <item name="colorPrimaryVariant">@color/primaryLightColor</item>
+    <item name="colorSecondary">@color/secondaryColor</item>
+    <item name="colorSecondaryVariant">@color/secondaryDarkColor</item>
+    <item name="colorOnPrimary">@color/primaryTextColor</item>
+    <item name="colorOnSecondary">@color/secondaryTextColor</item>
+    <item name="android:statusBarColor">@color/primaryColor</item>
+    <item name="android:fontFamily">@font/rubik</item>
+    <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
+    <item name="windowActionModeOverlay">true</item>
+    <item name="actionModeBackground">?colorPrimaryVariant</item>
+  </style>
+
+  <style name="AppTheme.NoActionBar">
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+  </style>
+
+  <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+  <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+  <style name="IOGallery.Widget.TextView.ImageLabel.Detail" parent="Widget.AppCompat.TextView">
+    <item name="android:background">@drawable/label_background</item>
+    <item name="android:textColor">@color/secondaryTextColor</item>
+    <item name="android:textSize">@dimen/image_label_text</item>
+    <item name="android:gravity">center</item>
+    <item name="android:drawableStart">@drawable/ic_cloud_vision</item>
+    <item name="android:drawablePadding">@dimen/image_label_drawablePadding</item>
+    <item name="android:elevation">@dimen/image_label_elevation</item>
+  </style>
+
+</resources>
