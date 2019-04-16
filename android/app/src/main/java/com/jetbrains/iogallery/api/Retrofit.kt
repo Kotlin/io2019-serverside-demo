@@ -13,11 +13,15 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 private val okHttpClient = OkHttpClient.Builder()
     .followRedirects(true)
     .followSslRedirects(true)
+    .connectTimeout(30L, TimeUnit.SECONDS)
+    .readTimeout(30L, TimeUnit.SECONDS)
+    .writeTimeout(30L, TimeUnit.SECONDS)
     .apply {
         if (BuildConfig.DEBUG) {
             val interceptor = HttpLoggingInterceptor()
