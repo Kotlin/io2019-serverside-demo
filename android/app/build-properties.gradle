@@ -1,0 +1,9 @@
+apply plugin: 'com.novoda.build-properties'
+
+buildProperties {
+    secrets.using rootProject.file('build-config/secrets.properties')
+}
+
+project.ext {
+    secretsProps = buildProperties.secrets
+}

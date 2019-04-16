@@ -7,10 +7,7 @@ data class Photos(val photos: List<Photo>) {
     val isEmpty = photos.isEmpty()
 }
 
-data class Photo(val id: PhotoId, val label: String? = null) {
-
-    val imageUrl = "https://cloud-kotlin-io19.appspot.com/image/$id"
-}
+data class Photo(val id: PhotoId, val imageUrl: String, val label: String? = null)
 
 data class PhotoId(val rawId: String) {
 

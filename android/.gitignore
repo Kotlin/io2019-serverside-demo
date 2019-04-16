@@ -47,13 +47,10 @@ local.properties
 
 # App secrets are ignored...
 /app/google-services.json
-/team-props/*.properties
-/team-props/signing/*.keystore
-/team-props/play-store-keys.json
-
-# ...except for the debug signing configuration
-!/team-props/debugSigningConfig.properties
-!/team-props/signing/debug.keystore
+/build-config/*.properties
+/build-config/signing/*.keystore
 
 # Ignore Play Store publishing info
 /app/src/main/play/
+
+

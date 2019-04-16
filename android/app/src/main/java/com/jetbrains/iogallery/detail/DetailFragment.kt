@@ -70,6 +70,14 @@ class DetailFragment : Fragment() {
     }
 
     private fun onImagesListChanged(photos: Photos) {
+        if (photos.isEmpty) {
+            detailImage.setImageResource(R.drawable.ic_error)
+            imageLabel.isVisible = false
+            Snackbar.make(detailImage, "Could not load the image.", Snackbar.LENGTH_INDEFINITE)
+                .setAction("Retry") { loadImageData() }
+            return
+        }
+
         val photo = photos[photoId]
 
         val shouldAnimate = !imageLabel.isVisible

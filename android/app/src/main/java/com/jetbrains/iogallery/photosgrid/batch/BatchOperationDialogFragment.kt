@@ -1,6 +1,5 @@
 package com.jetbrains.iogallery.photosgrid.batch
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -54,7 +53,6 @@ class BatchOperationDialogFragment : BottomSheetDialogFragment() {
         dialogMessage.text = resources.getQuantityString(R.plurals.delete_confirmation_blurb, ids.size)
     }
 
-    @SuppressLint("Range") // This is a bug in the Lint check — it's flagging the default value of args.id
     private fun onDeleteConfirmed() {
         isCancelable = false
         requireView().isEnabled = false
