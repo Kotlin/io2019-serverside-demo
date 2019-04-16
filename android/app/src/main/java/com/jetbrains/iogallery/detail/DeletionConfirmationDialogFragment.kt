@@ -14,19 +14,14 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.jetbrains.iogallery.ImagesViewModel
 import com.jetbrains.iogallery.R
-import com.jetbrains.iogallery.api.ApiServer
-import com.jetbrains.iogallery.debug.DebugPreferences
 import com.jetbrains.iogallery.support.requiredPhotoIdFromRawString
-import com.jetbrains.iogallery.support.viewModelFactory
 import kotlinx.android.synthetic.main.fragment_deletion_confirmation.*
 import timber.log.Timber
 
 class DeletionConfirmationDialogFragment : BottomSheetDialogFragment() {
 
     private lateinit var viewModel: ImagesViewModel
-    private lateinit var debugPreferences: DebugPreferences
 
-    private var currentApiServer: ApiServer = ApiServer.SWAGGER
     private val id by requiredPhotoIdFromRawString(ARG_ID)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
@@ -35,11 +30,7 @@ class DeletionConfirmationDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        debugPreferences = DebugPreferences(requireActivity())
-        debugPreferences.subscribeToApiServer(this) { apiServer -> currentApiServer = apiServer }
-
-        viewModel = ViewModelProviders.of(this, viewModelFactory { ImagesViewModel { currentApiServer } })
-            .get(ImagesViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(ImagesViewModel::class.java)
         dialogMessage.text = resources.getQuantityString(R.plurals.delete_confirmation_blurb, 1)
 
         deleteButton.setOnClickListener { onDeleteConfirmed() }

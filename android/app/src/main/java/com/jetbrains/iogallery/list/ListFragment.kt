@@ -14,7 +14,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -23,27 +22,20 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
-import com.jakewharton.processphoenix.ProcessPhoenix
 import com.jetbrains.iogallery.ImagesViewModel
 import com.jetbrains.iogallery.R
-import com.jetbrains.iogallery.api.ApiServer
-import com.jetbrains.iogallery.debug.DebugPreferences
-import com.jetbrains.iogallery.debug.onDebugOptionsItemSelected
 import com.jetbrains.iogallery.list.batch.BatchOperationDialogFragment
 import com.jetbrains.iogallery.list.batch.BatchOperationType
 import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.model.Photos
 import com.jetbrains.iogallery.support.MarginItemDecoraton
 import com.jetbrains.iogallery.support.PrimaryActionModeCallback
-import com.jetbrains.iogallery.support.viewModelFactory
 import kotlinx.android.synthetic.main.fragment_list.*
 import timber.log.Timber
 
 class ListFragment : Fragment() {
 
     private lateinit var viewModel: ImagesViewModel
-    private lateinit var debugPreferences: DebugPreferences
-    private var currentApiServer: ApiServer = ApiServer.SWAGGER
 
     private val actionMode = PrimaryActionModeCallback()
     private var selectedItems: List<Photo> = emptyList()
@@ -67,11 +59,7 @@ class ListFragment : Fragment() {
         recyclerView.setHasFixedSize(true)
         recyclerView.addItemDecoration(MarginItemDecoraton(view.resources.getDimensionPixelSize(R.dimen.grid_images_margin)))
 
-        debugPreferences = DebugPreferences(requireActivity())
-        debugPreferences.subscribeToApiServer(this) { apiServer -> currentApiServer = apiServer }
-
-        viewModel = ViewModelProviders.of(this, viewModelFactory { ImagesViewModel { currentApiServer } })
-            .get(ImagesViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(ImagesViewModel::class.java)
         viewModel.imageEntries.observe(this, Observer(::onImagesListChanged))
 
         setHasOptionsMenu(true)
@@ -195,18 +183,15 @@ class ListFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {
-        menuInflater.inflate(R.menu.menu_debug, menu)
+        menuInflater.inflate(R.menu.list, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (onDebugOptionsItemSelected(item, ::onServerDialogDismissed)) return true
+        if (item.itemId == R.id.menu_refresh) {
+            loadImages(freshLoading = false)
+            return true
+        }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun onServerDialogDismissed() {
-        val context = requireContext()
-        Toast.makeText(context, getString(R.string.restarting_app), Toast.LENGTH_SHORT).show()
-        ProcessPhoenix.triggerRebirth(context)
     }
 }
 

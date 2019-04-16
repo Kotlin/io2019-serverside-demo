@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.jetbrains.iogallery.api.ApiServer
 import com.jetbrains.iogallery.api.ImagesBackend
 import com.jetbrains.iogallery.api.UploadException
 import com.jetbrains.iogallery.api.retrofit
@@ -20,10 +19,10 @@ import timber.log.Timber
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
-class UploadViewModel(private val apiServerProvider: () -> ApiServer) : ViewModel() {
+class UploadViewModel : ViewModel() {
 
     private val backend
-        get() = retrofit(apiServerProvider()).create(ImagesBackend::class.java)
+        get() = retrofit().create(ImagesBackend::class.java)
 
     fun uploadImages(contentResolver: ContentResolver, vararg imageUris: Uri): LiveData<UploadEvent> {
         val liveData = MediatorLiveData<UploadEvent>()

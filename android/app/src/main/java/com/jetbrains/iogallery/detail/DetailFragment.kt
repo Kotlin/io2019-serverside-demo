@@ -15,13 +15,10 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.jetbrains.iogallery.ImagesViewModel
 import com.jetbrains.iogallery.R
-import com.jetbrains.iogallery.api.ApiServer
-import com.jetbrains.iogallery.debug.DebugPreferences
 import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.model.PhotoId
 import com.jetbrains.iogallery.model.Photos
 import com.jetbrains.iogallery.support.picasso
-import com.jetbrains.iogallery.support.viewModelFactory
 import com.squareup.picasso.Callback
 import kotlinx.android.synthetic.main.fragment_details.*
 import timber.log.Timber
@@ -29,9 +26,7 @@ import timber.log.Timber
 class DetailFragment : Fragment() {
 
     private lateinit var viewModel: ImagesViewModel
-    private lateinit var debugPreferences: DebugPreferences
 
-    private var currentApiServer: ApiServer = ApiServer.SWAGGER
     private val args: DetailFragmentArgs by navArgs()
     private val photoId get() = PhotoId(args.rawId)
 
@@ -44,11 +39,7 @@ class DetailFragment : Fragment() {
         bottomToolbar.replaceMenu(R.menu.details)
         bottomToolbar.setOnMenuItemClickListener { onBottomToolbarMenuItemClicked(it) }
 
-        debugPreferences = DebugPreferences(requireActivity())
-        debugPreferences.subscribeToApiServer(this) { apiServer -> currentApiServer = apiServer }
-
-        viewModel = ViewModelProviders.of(this, viewModelFactory { ImagesViewModel { currentApiServer } })
-            .get(ImagesViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(ImagesViewModel::class.java)
 
         viewModel.imageEntries.observe(this, Observer(::onImagesListChanged))
         loadImageData()

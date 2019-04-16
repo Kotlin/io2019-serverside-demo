@@ -17,7 +17,6 @@
 
   <string name="delete_confirmation_positive_button">Delete</string>
   <string name="delete_confirmation_negative_button">Cancel</string>
-  <string name="restarting_app">API server changed, restarting app…</string>
 
   <plurals name="delete_result_blurb_error">
     <item quantity="one">Could not delete the image</item>
@@ -46,4 +45,6 @@
     <item quantity="one">One image failed uploading</item>
     <item quantity="other">%d images failed uploading</item>
   </plurals>
+
+  <string name="refresh">Refresh</string>
 </resources>

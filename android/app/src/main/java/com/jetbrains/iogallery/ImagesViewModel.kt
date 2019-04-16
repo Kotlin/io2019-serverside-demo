@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.jetbrains.iogallery.api.ApiServer
 import com.jetbrains.iogallery.api.ImagesBackend
 import com.jetbrains.iogallery.api.retrofit
 import com.jetbrains.iogallery.model.ApiPhotos
@@ -16,10 +15,10 @@ import com.shopify.livedataktx.map
 import com.shopify.livedataktx.toKtx
 import timber.log.Timber
 
-class ImagesViewModel(private val apiServerProvider: () -> ApiServer) : ViewModel() {
+class ImagesViewModel : ViewModel() {
 
     private val backend
-        get() = retrofit(apiServerProvider()).create(ImagesBackend::class.java)
+        get() = retrofit().create(ImagesBackend::class.java)
 
     private val imageEntriesMediator = MediatorLiveData<ApiPhotos>()
 

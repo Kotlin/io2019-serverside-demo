@@ -11,9 +11,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.jetbrains.iogallery.R
-import com.jetbrains.iogallery.api.ApiServer
-import com.jetbrains.iogallery.debug.DebugPreferences
-import com.jetbrains.iogallery.support.viewModelFactory
 import com.jetbrains.iogallery.uploader.UploadEvent.Finished
 import com.jetbrains.iogallery.uploader.UploadEvent.ImageUploadFailure
 import com.jetbrains.iogallery.uploader.UploadEvent.ImageUploadSuccess
@@ -24,8 +21,7 @@ private const val COMPLETION_MESSAGE_DELAY = 1500L
 class UploadFragment : Fragment() {
 
     private lateinit var viewModel: UploadViewModel
-    private lateinit var debugPreferences: DebugPreferences
-    private var currentApiServer: ApiServer = ApiServer.SWAGGER
+
     private val args: UploadFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
@@ -34,11 +30,7 @@ class UploadFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        debugPreferences = DebugPreferences(requireActivity())
-        debugPreferences.subscribeToApiServer(this) { apiServer -> currentApiServer = apiServer }
-
-        viewModel = ViewModelProviders.of(this, viewModelFactory { UploadViewModel { currentApiServer } })
-            .get(UploadViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(UploadViewModel::class.java)
 
         val contentResolver = requireContext().contentResolver
         viewModel.uploadImages(contentResolver, *args.imageUris)

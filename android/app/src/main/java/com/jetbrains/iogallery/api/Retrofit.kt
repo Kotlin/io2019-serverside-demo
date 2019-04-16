@@ -27,17 +27,12 @@ private val okHttpClient = OkHttpClient.Builder()
     }
     .build()
 
-fun retrofit(apiServer: ApiServer): Retrofit = Retrofit.Builder()
-    .baseUrl(apiServer.baseUrl)
+fun retrofit(): Retrofit = Retrofit.Builder()
+    .baseUrl("https://cloud-kotlin-io19.appspot.com/")
     .client(okHttpClient)
     .addConverterFactory(GsonConverterFactory.create())
     .addCallAdapterFactory(LiveDataCallAdapterFactory)
     .build()
-
-enum class ApiServer(val baseUrl: String) {
-    SWAGGER("https://virtserver.swaggerhub.com/seebrock3r/io-gallery/1.0.0/"),
-    GCP("https://cloud-kotlin-io19.appspot.com/")
-}
 
 private class LiveDataCallAdapter<R>(private val responseType: Type) : CallAdapter<R, LiveData<Result<R>>> {
 
