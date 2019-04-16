@@ -3,17 +3,18 @@ package com.jetbrains.iogallery.support
 import android.content.Context
 import com.google.cloud.storage.BlobId
 import com.google.cloud.storage.StorageOptions
+import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Request
 import com.squareup.picasso.RequestHandler
 import okio.Okio
 import java.io.ByteArrayInputStream
 
-fun Context.picasso(): Picasso {
-    return Picasso.Builder(this)
+fun Context.picasso(): Picasso =
+    Picasso.Builder(this)
+        .memoryCache(LruCache(this))
         .addRequestHandler(GoogleCloudStorageRequestHandler)
         .build()
-}
 
 private object GoogleCloudStorageRequestHandler : RequestHandler() {
 
