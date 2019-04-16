@@ -20,7 +20,7 @@
 
   <plurals name="delete_result_blurb_error">
     <item quantity="one">Could not delete the image</item>
-    <item quantity="other">Could not delete $d images</item>
+    <item quantity="other">Could not delete %d images</item>
   </plurals>
   <plurals name="delete_result_blurb_success">
     <item quantity="one">Image deleted successfully</item>
@@ -29,7 +29,7 @@
 
   <plurals name="b_and_w_result_blurb_error">
     <item quantity="one">Could not convert the image to black and white</item>
-    <item quantity="other">Could not convert $d images to black and white</item>
+    <item quantity="other">Could not convert %d images to black and white</item>
   </plurals>
   <plurals name="b_and_w_result_blurb_success">
     <item quantity="one">Image converted successfully to black and white</item>
