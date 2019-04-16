@@ -28,6 +28,13 @@ private val okHttpClient = OkHttpClient.Builder()
             interceptor.level = HttpLoggingInterceptor.Level.BASIC
             addInterceptor(interceptor)
         }
+
+        addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .addHeader("X-Authorization", BuildConfig.AUTH_HEADER)
+                .build()
+            chain.proceed(request)
+        }
     }
     .build()
 

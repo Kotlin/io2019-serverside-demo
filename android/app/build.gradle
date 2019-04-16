@@ -5,14 +5,17 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.1.0-alpha02"
+        classpath 'com.novoda:gradle-build-properties-plugin:0.4.1'
+        classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.1.0-alpha02'
     }
 }
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: "androidx.navigation.safeargs.kotlin"
+apply plugin: 'androidx.navigation.safeargs.kotlin'
+
+apply from: 'build-properties.gradle'
 
 android {
     compileSdkVersion 28
@@ -23,6 +26,8 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName '1.0'
+
+        buildConfigField 'String', 'AUTH_HEADER', "\"${secretsProps['authHeader'].string}\""
     }
 
     buildTypes {

@@ -38,7 +38,7 @@ class UploadViewModel : ViewModel() {
                 val imageLiveData = backend.uploadImage(contentResolver, uri)
                 liveData.addSource(imageLiveData) {
                     if (it.isSuccess) {
-                        Timber.i("Image $uri uploaded, it now has ID ${it.getOrThrow().id}")
+                        Timber.i("Image $uri uploaded")
                         liveData.postValue(UploadEvent.ImageUploadSuccess(uri, remainingCount()))
                         successesCount.incrementAndGet()
                     } else {
