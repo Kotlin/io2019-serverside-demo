@@ -56,7 +56,7 @@ class BatchOperationDialogFragment : BottomSheetDialogFragment() {
     private fun onDeleteConfirmed() {
         isCancelable = false
         requireView().isEnabled = false
-        dialogConfirmationGroup.isInvisible = true
+        hideDialogMessageViews()
         progressBar.isInvisible = false
 
         ids.forEach { id ->
@@ -86,7 +86,7 @@ class BatchOperationDialogFragment : BottomSheetDialogFragment() {
     private fun makeImagesBlackAndWhite() {
         isCancelable = false
         requireView().isEnabled = false
-        dialogConfirmationGroup.isInvisible = true
+        hideDialogMessageViews()
         progressBar.isInvisible = false
 
         ids.forEach { id ->
@@ -100,6 +100,14 @@ class BatchOperationDialogFragment : BottomSheetDialogFragment() {
                     }
                 })
         }
+    }
+
+    private fun hideDialogMessageViews() {
+        dialogTitle.isInvisible = true
+        dialogMessage.isInvisible = true
+        confirmButton.isInvisible = true
+        cancelButton.isInvisible = true
+        dialogImage.isInvisible = true
     }
 
     private fun onImageConverted(id: PhotoId) {

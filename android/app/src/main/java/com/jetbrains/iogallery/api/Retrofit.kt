@@ -63,7 +63,9 @@ private class LiveDataCallAdapter<R>(private val responseType: Type) : CallAdapt
                         if (response.isSuccessful) {
                             postValue(Result.success(response.body()!!))
                         } else {
-                            postValue(Result.failure(HttpException(response)))
+                            val request = call.request()
+                            val exception = RuntimeException("Error in request ${request.method()} ${request.url()}", HttpException(response))
+                            postValue(Result.failure(exception))
                         }
                     }
 

@@ -41,7 +41,7 @@ class DeletionConfirmationDialogFragment : BottomSheetDialogFragment() {
     private fun onDeleteConfirmed() {
         isCancelable = false
         requireView().isEnabled = false
-        dialogConfirmationGroup.isInvisible = true
+        hideDialogMessageViews()
         progressBar.isInvisible = false
 
         viewModel.deleteImage(id)
@@ -53,6 +53,14 @@ class DeletionConfirmationDialogFragment : BottomSheetDialogFragment() {
                     onDeleteFailure(result)
                 }
             })
+    }
+
+    private fun hideDialogMessageViews() {
+        dialogTitle.isInvisible = true
+        dialogMessage.isInvisible = true
+        deleteButton.isInvisible = true
+        cancelButton.isInvisible = true
+        dialogImage.isInvisible = true
     }
 
     private fun onImageDeleted() {
