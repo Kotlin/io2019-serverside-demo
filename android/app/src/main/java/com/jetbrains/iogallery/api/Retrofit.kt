@@ -39,6 +39,7 @@ private val okHttpClient = OkHttpClient.Builder()
     .build()
 
 const val BASE_URI = "https://cloud-kotlin-io19.appspot.com/"
+const val SHARE_BASE_URI = "https://20190417t135928-dot-cloud-kotlin-io19.appspot.com/"
 
 fun retrofit(): Retrofit = Retrofit.Builder()
     .baseUrl(BASE_URI)

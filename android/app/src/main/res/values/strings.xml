@@ -5,8 +5,6 @@
   <string name="uploading_images">Uploading images…</string>
   <string name="grid_empty_state_label">Nothing here yet, what about</string>
   <string name="grid_empty_state_cta">adding something?</string>
-  <string name="menu_delete_image">Delete image</string>
-  <string name="menu_make_image_black_and_white">Make image black and white</string>
   <string name="upload_complete">Upload completed</string>
   <string name="delete_confirmation_title">Are you sure?</string>
 
@@ -46,5 +44,9 @@
     <item quantity="other">%d images failed uploading</item>
   </plurals>
 
-  <string name="refresh">Refresh</string>
+  <string name="menu_refresh">Refresh</string>
+  <string name="menu_share">Share</string>
+  <string name="menu_delete_image">Delete image</string>
+  <string name="menu_make_image_black_and_white">Make image black and white</string>
+  <string name="send_to">Share image link to…</string>
 </resources>

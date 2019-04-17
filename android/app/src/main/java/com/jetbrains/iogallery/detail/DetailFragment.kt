@@ -1,5 +1,6 @@
 package com.jetbrains.iogallery.detail
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -17,6 +18,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.jetbrains.iogallery.ImagesViewModel
 import com.jetbrains.iogallery.R
+import com.jetbrains.iogallery.api.SHARE_BASE_URI
 import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.model.PhotoId
 import com.jetbrains.iogallery.model.Photos
@@ -116,6 +118,7 @@ class DetailFragment : Fragment() {
         when (item.itemId) {
             R.id.menu_delete -> onDeleteClicked(photoId)
             R.id.menu_b_and_w -> onBlackAndWhiteClicked(photoId)
+            R.id.menu_share -> onShareClicked(photoId)
             else -> return false
         }
         return super.onOptionsItemSelected(item)
@@ -142,5 +145,13 @@ class DetailFragment : Fragment() {
                     Snackbar.make(detailsRoot, errorMessage, Snackbar.LENGTH_LONG).show()
                 }
             })
+    }
+
+    private fun onShareClicked(photoId: PhotoId) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_TEXT, "${SHARE_BASE_URI}share/${photoId.rawId}")
+            type = "text/plain"
+        }
+        requireActivity().startActivity(Intent.createChooser(intent, resources.getText(R.string.send_to)))
     }
 }

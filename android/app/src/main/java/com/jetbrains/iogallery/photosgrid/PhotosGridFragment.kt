@@ -137,7 +137,7 @@ class PhotosGridFragment : Fragment() {
     private fun startActionMode() {
         if (actionMode.isActive) return
 
-        actionMode.startActionMode(requireActivity(), R.menu.details)
+        actionMode.startActionMode(requireActivity(), R.menu.photos_grid_action_mode)
         animateStatusBarColorTo(R.color.primaryLightColor)
 
         fab.animate()
