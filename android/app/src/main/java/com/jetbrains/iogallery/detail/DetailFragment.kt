@@ -43,24 +43,6 @@ class DetailFragment : Fragment() {
 
         viewModel.imageEntries.observe(this, Observer(::onImagesListChanged))
         loadImageData()
-
-        fab.setOnClickListener { onCategorizeImageClicked() }
-    }
-
-    private fun onCategorizeImageClicked() {
-        detailImage.animate().alpha(.75f)
-        viewModel.categorizeImage(photoId)
-            .observe(this, Observer { result ->
-                if (result.isSuccess) {
-                    Timber.i("Image $photoId categorised successfully, reloading data.")
-                    loadImageData()
-                } else {
-                    detailImage.animate().alpha(1f)
-                    val errorMessage = "Error while categorising image $photoId"
-                    Timber.e(result.exceptionOrNull()!!, "Ruh roh! $errorMessage")
-                    Snackbar.make(detailsRoot, errorMessage, Snackbar.LENGTH_LONG).show()
-                }
-            })
     }
 
     private fun loadImageData() {

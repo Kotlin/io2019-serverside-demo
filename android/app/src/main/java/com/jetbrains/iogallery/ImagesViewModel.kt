@@ -52,8 +52,6 @@ class ImagesViewModel : ViewModel() {
         }
     }
 
-    fun categorizeImage(id: PhotoId): LiveData<Result<Unit>> = backend.categorizeImage(id.rawId)
-
     fun makeImageBlackAndWhite(id: PhotoId): LiveData<Result<Unit>> = backend.makeImageBlackAndWhite(id.rawId)
 
     fun deleteImage(id: PhotoId): LiveData<Result<Unit>> = backend.deleteImage(id.rawId)

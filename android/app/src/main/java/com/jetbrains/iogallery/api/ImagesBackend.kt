@@ -23,9 +23,6 @@ interface ImagesBackend {
     @DELETE("image/{id}")
     fun deleteImage(@Path("id") id: String): LiveData<Result<Unit>>
 
-    @PUT("image/{id}/categorize")
-    fun categorizeImage(@Path("id") id: String): LiveData<Result<Unit>>
-
     @PUT("image/{id}/b-and-w")
     fun makeImageBlackAndWhite(@Path("id") id: String): LiveData<Result<Unit>>
 }

@@ -42,12 +42,5 @@
     app:backgroundTint="@color/primaryColor"
     app:fabAlignmentMode="end" />
 
-  <com.google.android.material.floatingactionbutton.FloatingActionButton
-    android:id="@+id/fab"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    app:layout_anchor="@id/bottomToolbar"
-    app:srcCompat="@drawable/ic_cloud_vision" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
