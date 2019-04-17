@@ -1,5 +1,6 @@
 package com.jetbrains.iogallery.photosgrid
 
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.ClipData
 import android.content.Intent
@@ -14,6 +15,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorRes
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -24,6 +26,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
+import com.google.android.material.animation.ArgbEvaluatorCompat
 import com.jetbrains.iogallery.ImagesViewModel
 import com.jetbrains.iogallery.MainActivity
 import com.jetbrains.iogallery.R
@@ -135,6 +138,8 @@ class PhotosGridFragment : Fragment() {
         if (actionMode.isActive) return
 
         actionMode.startActionMode(requireActivity(), R.menu.details)
+        animateStatusBarColorTo(R.color.primaryLightColor)
+
         fab.animate()
             .scaleX(0f)
             .scaleY(0f)
@@ -145,6 +150,7 @@ class PhotosGridFragment : Fragment() {
         if (!actionMode.isActive) return
 
         actionMode.finishActionMode()
+        animateStatusBarColorTo(R.color.primaryColor)
         selectedItems = emptyList()
         photosAdapter.cancelMultiselect()
 
@@ -152,6 +158,18 @@ class PhotosGridFragment : Fragment() {
             .scaleX(1f)
             .scaleY(1f)
             .duration = 200
+    }
+
+    private fun animateStatusBarColorTo(@ColorRes endColor: Int) {
+        val window = requireActivity().window
+        ObjectAnimator.ofInt(
+            window,
+            "statusBarColor",
+            window.statusBarColor,
+            resources.getColor(endColor, requireContext().theme)
+        ).apply {
+            setEvaluator(ArgbEvaluatorCompat())
+        }.start()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
