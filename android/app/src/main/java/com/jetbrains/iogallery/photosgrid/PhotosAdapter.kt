@@ -29,7 +29,7 @@ class PhotosAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
-        val itemView = layoutInflater.inflate(R.layout.item_gallery_item, parent, false)
+        val itemView = layoutInflater.inflate(R.layout.item_photos_grid_item, parent, false)
         return PhotoViewHolder(itemView)
     }
 

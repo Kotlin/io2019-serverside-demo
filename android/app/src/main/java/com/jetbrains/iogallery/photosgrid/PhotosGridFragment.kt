@@ -195,7 +195,7 @@ class PhotosGridFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {
-        menuInflater.inflate(R.menu.list, menu)
+        menuInflater.inflate(R.menu.photos_grid, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
