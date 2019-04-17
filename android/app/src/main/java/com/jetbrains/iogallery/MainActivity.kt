@@ -7,8 +7,12 @@ import android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 import android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
 import android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.menu.ActionMenuItemView
+import androidx.appcompat.widget.ActionMenuView
+import androidx.core.view.children
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
+import com.jetbrains.iogallery.support.lastOfType
 import com.jetbrains.iogallery.support.setupPicasso
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
@@ -49,4 +53,9 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+
+    fun menuItemViews(): Sequence<ActionMenuItemView> {
+        val menuView = toolbar.children.lastOfType(ActionMenuView::class.java)
+        return menuView.children.filterIsInstance(ActionMenuItemView::class.java)
+    }
 }

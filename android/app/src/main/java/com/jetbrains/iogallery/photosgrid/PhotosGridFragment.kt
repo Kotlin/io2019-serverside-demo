@@ -17,12 +17,15 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.jetbrains.iogallery.ImagesViewModel
+import com.jetbrains.iogallery.MainActivity
 import com.jetbrains.iogallery.R
 import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.model.Photos
@@ -49,8 +52,7 @@ class PhotosGridFragment : Fragment() {
         emptyText2.setOnClickListener { onAddImagesClicked() }
         fab.setOnClickListener { onAddImagesClicked() }
 
-        val navController = findNavController()
-        photosAdapter = PhotosAdapter(requireActivity(), navController, ::onItemMultiselectChanged)
+        photosAdapter = PhotosAdapter(requireActivity(), ::onItemClicked, ::onItemMultiselectChanged)
         actionMode.onActionItemClickListener = ::onActionModeItemClicked
         actionMode.onActionModeFinishedListener = ::finishActionMode
 
@@ -65,6 +67,16 @@ class PhotosGridFragment : Fragment() {
         setHasOptionsMenu(true)
 
         loadImages(freshLoading = true)
+    }
+
+    private fun onItemClicked(photo: Photo) {
+        fab.animate()
+            .setInterpolator(FastOutLinearInInterpolator())
+            .translationY(fab.height / 2F)
+            .duration = 150
+
+        findNavController()
+            .navigate(PhotosGridFragmentDirections.actionPhotosGridFragmentToDetailFragment(photo.id.rawId))
     }
 
     private fun onAddImagesClicked() {
@@ -188,10 +200,23 @@ class PhotosGridFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_refresh) {
-            loadImages(freshLoading = false)
+            onRefreshSelected()
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun onRefreshSelected() {
+        val mainActivity = requireActivity() as MainActivity
+        val menuItemView = mainActivity.menuItemViews().last()
+
+        menuItemView.animate()
+            .setInterpolator(FastOutSlowInInterpolator())
+            .rotation(360F)
+            .withEndAction { menuItemView.rotation = 0F }
+            .duration = 250
+
+        loadImages(freshLoading = false)
     }
 }
 
