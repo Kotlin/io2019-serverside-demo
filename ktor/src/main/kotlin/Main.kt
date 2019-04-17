@@ -1,21 +1,34 @@
-package com.jetbrains
+@file:UseExperimental(KtorExperimentalLocationsAPI::class)
 
+package com.jetbrains.ktorServer
+
+
+import com.jetbrains.ktorServer.routes.home
 import io.ktor.application.Application
-import io.ktor.application.call
-import io.ktor.http.ContentType
-import io.ktor.http.content.resources
-import io.ktor.http.content.static
-import io.ktor.response.respondText
-import io.ktor.routing.get
+import io.ktor.application.install
+import io.ktor.features.ContentNegotiation
+import io.ktor.gson.gson
+import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.Locations
+import io.ktor.locations.locations
 import io.ktor.routing.routing
+import routes.convertToMonoChrome
+import routes.listData
+import routes.share
 
-fun Application.main(testing: Boolean = false) {
+
+fun Application.main() {
+    install(ContentNegotiation) {
+        gson {
+            setPrettyPrinting()
+            serializeNulls()
+        }
+    }
+    install(Locations)
     routing {
-        get("/") {
-            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
-        }
-        static("/static") {
-            resources("static")
-        }
+        home()
+        convertToMonoChrome()
+        listData()
+        share()
     }
 }
