@@ -2,6 +2,8 @@ package com.jetbrains.iogallery.detail
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -36,8 +38,7 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        bottomToolbar.replaceMenu(R.menu.details)
-        bottomToolbar.setOnMenuItemClickListener { onBottomToolbarMenuItemClicked(it) }
+        setHasOptionsMenu(true)
 
         viewModel = ViewModelProviders.of(this).get(ImagesViewModel::class.java)
 
@@ -106,13 +107,18 @@ class DetailFragment : Fragment() {
             })
     }
 
-    private fun onBottomToolbarMenuItemClicked(item: MenuItem): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.details, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_delete -> onDeleteClicked(photoId)
             R.id.menu_b_and_w -> onBlackAndWhiteClicked(photoId)
             else -> return false
         }
-        return true
+        return super.onOptionsItemSelected(item)
     }
 
     private fun onDeleteClicked(id: PhotoId) {
