@@ -133,9 +133,11 @@ class DetailFragment : Fragment() {
 
     private fun onMonochromeClicked(id: PhotoId) {
         detailImage.animate().alpha(.75f)
+        progressBar.isVisible = true
         val ktorViewModel = ViewModelProviders.of(this).get(PhotosKtorViewModel::class.java)
         ktorViewModel.makeImageMonochrome(id)
             .observe(this, Observer { result ->
+                progressBar.isVisible = false
                 if (result.isSuccess) {
                     Timber.i("Image $photoId desaturated successfully, reloading data.")
                     Snackbar.make(detailsRoot, "Image successfully converted to monochrome", Snackbar.LENGTH_SHORT).show()
