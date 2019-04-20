@@ -16,7 +16,7 @@
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintBottom_toBottomOf="parent"
     tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-    tools:listitem="@layout/item_gallery_item"
+    tools:listitem="@layout/item_photos_grid_item"
     tools:itemCount="15"
     tools:visibility="gone" />
 

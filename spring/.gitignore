@@ -29,3 +29,4 @@ HELP.md
 .vscode/
 
 **/secret.*
+**/Secret*.kt

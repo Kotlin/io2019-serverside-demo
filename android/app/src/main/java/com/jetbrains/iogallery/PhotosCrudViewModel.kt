@@ -4,9 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.jetbrains.iogallery.api.BASE_URI
-import com.jetbrains.iogallery.api.ImagesBackend
-import com.jetbrains.iogallery.api.retrofit
+import com.jetbrains.iogallery.api.Endpoint
+import com.jetbrains.iogallery.api.crudRetrofit
 import com.jetbrains.iogallery.model.ApiPhotos
 import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.model.PhotoId
@@ -15,10 +14,9 @@ import com.shopify.livedataktx.map
 import com.shopify.livedataktx.toKtx
 import timber.log.Timber
 
-class ImagesViewModel : ViewModel() {
+class PhotosCrudViewModel : ViewModel() {
 
-    private val backend
-        get() = retrofit().create(ImagesBackend::class.java)
+    private val backend by lazy { crudRetrofit() }
 
     private val imageEntriesMediator = MediatorLiveData<Result<ApiPhotos>>()
 
@@ -31,7 +29,7 @@ class ImagesViewModel : ViewModel() {
             if (result.isSuccess) {
                 Photos(result.getOrThrow().embedded.photos
                     .map { apiPhoto ->
-                        val imageUrl = BASE_URI + apiPhoto.uri
+                        val imageUrl = Endpoint.CRUD.baseUrl + apiPhoto.uri
                         Photo(PhotoId(apiPhoto.rawId), imageUrl)
                     }
                 )
@@ -51,10 +49,6 @@ class ImagesViewModel : ViewModel() {
             imageEntriesMediator.postValue(it)
         }
     }
-
-    fun categorizeImage(id: PhotoId): LiveData<Result<Unit>> = backend.categorizeImage(id.rawId)
-
-    fun makeImageBlackAndWhite(id: PhotoId): LiveData<Result<Unit>> = backend.makeImageBlackAndWhite(id.rawId)
 
     fun deleteImage(id: PhotoId): LiveData<Result<Unit>> = backend.deleteImage(id.rawId)
 }

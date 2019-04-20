@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.net.toUri
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import com.jetbrains.iogallery.R
 import com.jetbrains.iogallery.model.Photo
@@ -16,7 +15,7 @@ import timber.log.Timber
 
 class PhotosAdapter(
     context: Context,
-    private val navController: NavController,
+    private val onItemClicked: (Photo) -> Unit,
     private val itemMultiSelectCallback: (selectedItems: List<Photo>) -> Unit
 ) : RecyclerView.Adapter<PhotosAdapter.PhotoViewHolder>() {
 
@@ -30,7 +29,7 @@ class PhotosAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
-        val itemView = layoutInflater.inflate(R.layout.item_gallery_item, parent, false)
+        val itemView = layoutInflater.inflate(R.layout.item_photos_grid_item, parent, false)
         return PhotoViewHolder(itemView)
     }
 
@@ -81,10 +80,6 @@ class PhotosAdapter(
             .placeholder(R.drawable.loading_placeholder)
             .error(R.drawable.broken_placeholder)
             .into(targetView)
-    }
-
-    private fun onItemClicked(photo: Photo) {
-        navController.navigate(PhotosGridFragmentDirections.actionPhotosGridFragmentToDetailFragment(photo.id.rawId))
     }
 
     private fun onItemLongClicked(photo: Photo, selected: Boolean) {

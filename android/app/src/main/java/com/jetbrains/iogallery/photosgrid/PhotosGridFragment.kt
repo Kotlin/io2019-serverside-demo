@@ -1,5 +1,6 @@
 package com.jetbrains.iogallery.photosgrid
 
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.ClipData
 import android.content.Intent
@@ -14,15 +15,21 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorRes
+import androidx.annotation.FloatRange
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
-import com.jetbrains.iogallery.ImagesViewModel
+import com.google.android.material.animation.ArgbEvaluatorCompat
+import com.jetbrains.iogallery.MainActivity
+import com.jetbrains.iogallery.PhotosCrudViewModel
 import com.jetbrains.iogallery.R
 import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.model.Photos
@@ -35,7 +42,7 @@ import timber.log.Timber
 
 class PhotosGridFragment : Fragment() {
 
-    private lateinit var viewModel: ImagesViewModel
+    private lateinit var viewModel: PhotosCrudViewModel
 
     private val actionMode = PrimaryActionModeCallback()
     private var selectedItems: List<Photo> = emptyList()
@@ -49,8 +56,7 @@ class PhotosGridFragment : Fragment() {
         emptyText2.setOnClickListener { onAddImagesClicked() }
         fab.setOnClickListener { onAddImagesClicked() }
 
-        val navController = findNavController()
-        photosAdapter = PhotosAdapter(requireActivity(), navController, ::onItemMultiselectChanged)
+        photosAdapter = PhotosAdapter(requireActivity(), ::onItemClicked, ::onItemMultiselectChanged)
         actionMode.onActionItemClickListener = ::onActionModeItemClicked
         actionMode.onActionModeFinishedListener = ::finishActionMode
 
@@ -59,12 +65,22 @@ class PhotosGridFragment : Fragment() {
         recyclerView.setHasFixedSize(true)
         recyclerView.addItemDecoration(MarginItemDecoraton(view.resources.getDimensionPixelSize(R.dimen.grid_images_margin)))
 
-        viewModel = ViewModelProviders.of(this).get(ImagesViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(PhotosCrudViewModel::class.java)
         viewModel.imageEntries.observe(this, Observer(::onImagesListChanged))
 
         setHasOptionsMenu(true)
 
         loadImages(freshLoading = true)
+    }
+
+    private fun onItemClicked(photo: Photo) {
+        fab.animate()
+            .setInterpolator(FastOutLinearInInterpolator())
+            .translationY(fab.height / 2F)
+            .duration = 150
+
+        findNavController()
+            .navigate(PhotosGridFragmentDirections.actionPhotosGridFragmentToDetailFragment(photo.id.rawId))
     }
 
     private fun onAddImagesClicked() {
@@ -83,7 +99,7 @@ class PhotosGridFragment : Fragment() {
     private fun onActionModeItemClicked(item: MenuItem) {
         when (item.itemId) {
             R.id.menu_delete -> startBatchOperation(BatchOperationType.DELETE)
-            R.id.menu_b_and_w -> startBatchOperation(BatchOperationType.BLACK_AND_WHITE)
+            R.id.menu_b_and_w -> startBatchOperation(BatchOperationType.MONOCHROME)
         }
     }
 
@@ -106,6 +122,13 @@ class PhotosGridFragment : Fragment() {
             recyclerView.isVisible = false
             emptyState.isVisible = false
             progressBar.isVisible = true
+        } else {
+            progressBar.isVisible = true
+            animateFabScale(0F)
+            recyclerView.animate()
+                .alpha(.75F)
+                .duration = 200
+            recyclerView.isEnabled = false
         }
         viewModel.fetchImageEntries()
     }
@@ -122,24 +145,40 @@ class PhotosGridFragment : Fragment() {
     private fun startActionMode() {
         if (actionMode.isActive) return
 
-        actionMode.startActionMode(requireActivity(), R.menu.details)
-        fab.animate()
-            .scaleX(0f)
-            .scaleY(0f)
-            .duration = 200
+        actionMode.startActionMode(requireActivity(), R.menu.photos_grid_action_mode)
+        animateStatusBarColorTo(R.color.primaryLightColor)
+
+        animateFabScale(0F)
     }
 
     private fun finishActionMode() {
         if (!actionMode.isActive) return
 
         actionMode.finishActionMode()
+        animateStatusBarColorTo(R.color.primaryColor)
         selectedItems = emptyList()
         photosAdapter.cancelMultiselect()
 
+        animateFabScale(1F)
+    }
+
+    private fun animateFabScale(@FloatRange(from = 0.0, to = 1.0) scale: Float) {
         fab.animate()
-            .scaleX(1f)
-            .scaleY(1f)
+            .scaleX(scale)
+            .scaleY(scale)
             .duration = 200
+    }
+
+    private fun animateStatusBarColorTo(@ColorRes endColor: Int) {
+        val window = requireActivity().window
+        ObjectAnimator.ofInt(
+            window,
+            "statusBarColor",
+            window.statusBarColor,
+            resources.getColor(endColor, requireContext().theme)
+        ).apply {
+            setEvaluator(ArgbEvaluatorCompat())
+        }.start()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -173,6 +212,14 @@ class PhotosGridFragment : Fragment() {
             showEmptyState(true)
         } else {
             showEmptyState(false)
+            if (recyclerView.isEnabled.not()) {
+                progressBar.isVisible = false
+                animateFabScale(1F)
+                recyclerView.animate()
+                    .alpha(1F)
+                    .duration = 200
+                recyclerView.isEnabled = true
+            }
             photosAdapter.replaceItemsWith(photos.photos)
         }
     }
@@ -183,15 +230,28 @@ class PhotosGridFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {
-        menuInflater.inflate(R.menu.list, menu)
+        menuInflater.inflate(R.menu.photos_grid, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_refresh) {
-            loadImages(freshLoading = false)
+            onRefreshSelected()
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun onRefreshSelected() {
+        val mainActivity = requireActivity() as MainActivity
+        val menuItemView = mainActivity.menuItemViews().last()
+
+        menuItemView.animate()
+            .setInterpolator(FastOutSlowInInterpolator())
+            .rotation(360F)
+            .withEndAction { menuItemView.rotation = 0F }
+            .duration = 250
+
+        loadImages(freshLoading = false)
     }
 }
 

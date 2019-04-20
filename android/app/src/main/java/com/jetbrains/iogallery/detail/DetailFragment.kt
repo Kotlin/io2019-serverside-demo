@@ -1,7 +1,10 @@
 package com.jetbrains.iogallery.detail
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +16,10 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
-import com.jetbrains.iogallery.ImagesViewModel
+import com.jetbrains.iogallery.PhotosCrudViewModel
+import com.jetbrains.iogallery.PhotosKtorViewModel
 import com.jetbrains.iogallery.R
+import com.jetbrains.iogallery.api.Endpoint
 import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.model.PhotoId
 import com.jetbrains.iogallery.model.Photos
@@ -25,7 +30,7 @@ import timber.log.Timber
 
 class DetailFragment : Fragment() {
 
-    private lateinit var viewModel: ImagesViewModel
+    private lateinit var crudViewModel: PhotosCrudViewModel
 
     private val args: DetailFragmentArgs by navArgs()
     private val photoId get() = PhotoId(args.rawId)
@@ -36,37 +41,18 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        bottomToolbar.replaceMenu(R.menu.details)
-        bottomToolbar.setOnMenuItemClickListener { onBottomToolbarMenuItemClicked(it) }
+        setHasOptionsMenu(true)
 
-        viewModel = ViewModelProviders.of(this).get(ImagesViewModel::class.java)
+        crudViewModel = ViewModelProviders.of(this).get(PhotosCrudViewModel::class.java)
 
-        viewModel.imageEntries.observe(this, Observer(::onImagesListChanged))
+        crudViewModel.imageEntries.observe(this, Observer(::onImagesListChanged))
         loadImageData()
-
-        fab.setOnClickListener { onCategorizeImageClicked() }
-    }
-
-    private fun onCategorizeImageClicked() {
-        detailImage.animate().alpha(.75f)
-        viewModel.categorizeImage(photoId)
-            .observe(this, Observer { result ->
-                if (result.isSuccess) {
-                    Timber.i("Image $photoId categorised successfully, reloading data.")
-                    loadImageData()
-                } else {
-                    detailImage.animate().alpha(1f)
-                    val errorMessage = "Error while categorising image $photoId"
-                    Timber.e(result.exceptionOrNull()!!, "Ruh roh! $errorMessage")
-                    Snackbar.make(detailsRoot, errorMessage, Snackbar.LENGTH_LONG).show()
-                }
-            })
     }
 
     private fun loadImageData() {
         Timber.d("Loading images list...")
         progressBar.isVisible = true
-        viewModel.fetchImageEntries()
+        crudViewModel.fetchImageEntries()
     }
 
     private fun onImagesListChanged(photos: Photos) {
@@ -124,13 +110,19 @@ class DetailFragment : Fragment() {
             })
     }
 
-    private fun onBottomToolbarMenuItemClicked(item: MenuItem): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.details, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_delete -> onDeleteClicked(photoId)
-            R.id.menu_b_and_w -> onBlackAndWhiteClicked(photoId)
+            R.id.menu_b_and_w -> onMonochromeClicked(photoId)
+            R.id.menu_share -> onShareClicked(photoId)
             else -> return false
         }
-        return true
+        return super.onOptionsItemSelected(item)
     }
 
     private fun onDeleteClicked(id: PhotoId) {
@@ -139,13 +131,16 @@ class DetailFragment : Fragment() {
         dialog.showNow(requireActivity().supportFragmentManager, "CONFIRMATION")
     }
 
-    private fun onBlackAndWhiteClicked(id: PhotoId) {
+    private fun onMonochromeClicked(id: PhotoId) {
         detailImage.animate().alpha(.75f)
-        viewModel.makeImageBlackAndWhite(id)
+        progressBar.isVisible = true
+        val ktorViewModel = ViewModelProviders.of(this).get(PhotosKtorViewModel::class.java)
+        ktorViewModel.makeImageMonochrome(id)
             .observe(this, Observer { result ->
+                progressBar.isVisible = false
                 if (result.isSuccess) {
                     Timber.i("Image $photoId desaturated successfully, reloading data.")
-                    Snackbar.make(detailsRoot, "Image successfully converted to black & white", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(detailsRoot, "Image successfully converted to monochrome", Snackbar.LENGTH_SHORT).show()
                     loadImageData()
                 } else {
                     detailImage.animate().alpha(1f)
@@ -154,5 +149,13 @@ class DetailFragment : Fragment() {
                     Snackbar.make(detailsRoot, errorMessage, Snackbar.LENGTH_LONG).show()
                 }
             })
+    }
+
+    private fun onShareClicked(photoId: PhotoId) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_TEXT, "${Endpoint.KTOR.baseUrl}share/${photoId.rawId}")
+            type = "text/plain"
+        }
+        requireActivity().startActivity(Intent.createChooser(intent, resources.getText(R.string.send_to)))
     }
 }

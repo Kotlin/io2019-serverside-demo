@@ -12,7 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.jetbrains.iogallery.ImagesViewModel
+import com.jetbrains.iogallery.PhotosCrudViewModel
 import com.jetbrains.iogallery.R
 import com.jetbrains.iogallery.support.requiredPhotoIdFromRawString
 import kotlinx.android.synthetic.main.fragment_deletion_confirmation.*
@@ -20,7 +20,7 @@ import timber.log.Timber
 
 class DeletionConfirmationDialogFragment : BottomSheetDialogFragment() {
 
-    private lateinit var viewModel: ImagesViewModel
+    private lateinit var viewModel: PhotosCrudViewModel
 
     private val id by requiredPhotoIdFromRawString(ARG_ID)
 
@@ -30,7 +30,7 @@ class DeletionConfirmationDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProviders.of(this).get(ImagesViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(PhotosCrudViewModel::class.java)
         dialogMessage.text = resources.getQuantityString(R.plurals.delete_confirmation_blurb, 1)
 
         deleteButton.setOnClickListener { onDeleteConfirmed() }
@@ -41,7 +41,7 @@ class DeletionConfirmationDialogFragment : BottomSheetDialogFragment() {
     private fun onDeleteConfirmed() {
         isCancelable = false
         requireView().isEnabled = false
-        dialogConfirmationGroup.isInvisible = true
+        hideDialogMessageViews()
         progressBar.isInvisible = false
 
         viewModel.deleteImage(id)
@@ -53,6 +53,14 @@ class DeletionConfirmationDialogFragment : BottomSheetDialogFragment() {
                     onDeleteFailure(result)
                 }
             })
+    }
+
+    private fun hideDialogMessageViews() {
+        dialogTitle.isInvisible = true
+        dialogMessage.isInvisible = true
+        deleteButton.isInvisible = true
+        cancelButton.isInvisible = true
+        dialogImage.isInvisible = true
     }
 
     private fun onImageDeleted() {

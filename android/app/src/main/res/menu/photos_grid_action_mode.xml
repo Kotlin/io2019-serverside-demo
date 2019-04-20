@@ -3,12 +3,6 @@
   xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <item
-    android:id="@+id/menu_share"
-    android:icon="@drawable/ic_share"
-    android:title="@string/menu_share"
-    app:showAsAction="always" />
-
-  <item
     android:id="@+id/menu_b_and_w"
     android:icon="@drawable/ic_filter_b_and_w"
     android:title="@string/menu_make_image_black_and_white"
@@ -18,6 +12,6 @@
     android:id="@+id/menu_delete"
     android:icon="@drawable/ic_delete"
     android:title="@string/menu_delete_image"
-    app:showAsAction="never" />
+    app:showAsAction="ifRoom" />
 
 </menu>
