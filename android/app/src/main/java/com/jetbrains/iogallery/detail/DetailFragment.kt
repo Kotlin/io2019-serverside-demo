@@ -153,7 +153,7 @@ class DetailFragment : Fragment() {
 
     private fun onShareClicked(photoId: PhotoId) {
         val intent = Intent(Intent.ACTION_SEND).apply {
-            putExtra(Intent.EXTRA_TEXT, "${Endpoint.KTOR}share/${photoId.rawId}")
+            putExtra(Intent.EXTRA_TEXT, "${Endpoint.KTOR.baseUrl}share/${photoId.rawId}")
             type = "text/plain"
         }
         requireActivity().startActivity(Intent.createChooser(intent, resources.getText(R.string.send_to)))
