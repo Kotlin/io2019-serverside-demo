@@ -37,6 +37,8 @@ dependencies {
     compile "io.ktor:ktor-gson:$ktor_version"
     compile "io.ktor:ktor-locations:$ktor_version"
     compile "ch.qos.logback:logback-classic:$logback_version"
+    compile 'com.google.cloud:google-cloud-datastore:1.66.0'
+    compile 'com.google.cloud:google-cloud-storage:1.70.0'
     testCompile "io.ktor:ktor-server-tests:$ktor_version"
 }
 

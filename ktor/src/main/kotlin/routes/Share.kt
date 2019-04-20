@@ -1,5 +1,5 @@
 @file: UseExperimental(KtorExperimentalLocationsAPI::class)
-package routes
+package com.jetbrains.ktorServer.routes
 
 import io.ktor.application.call
 import io.ktor.html.respondHtml
@@ -9,17 +9,16 @@ import io.ktor.locations.get
 import io.ktor.routing.Route
 import kotlinx.html.*
 
-@Location("/share/{id}") class share(val id: String)
+@Location("/share/{id}")
+class share(val id: String)
 
 fun Route.share() {
-    get<share> {
+    get<share> { share ->
         call.respondHtml {
             body {
-                h1 { +"Someone has shared a picture with you..."}
+                h1 { +"Someone has shared a picture with you..." }
                 br
-                div {
-                    +"Picture goes here"
-                }
+                img(alt = share.id, src = "https://cloud-kotlin-io19.appspot.com/image/${share.id}")
             }
         }
     }
