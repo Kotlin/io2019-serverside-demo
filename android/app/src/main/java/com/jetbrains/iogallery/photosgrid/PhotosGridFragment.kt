@@ -16,6 +16,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorRes
+import androidx.annotation.FloatRange
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -121,6 +122,13 @@ class PhotosGridFragment : Fragment() {
             recyclerView.isVisible = false
             emptyState.isVisible = false
             progressBar.isVisible = true
+        } else {
+            progressBar.isVisible = true
+            animateFabScale(0F)
+            recyclerView.animate()
+                .alpha(.75F)
+                .duration = 200
+            recyclerView.isEnabled = false
         }
         viewModel.fetchImageEntries()
     }
@@ -140,10 +148,7 @@ class PhotosGridFragment : Fragment() {
         actionMode.startActionMode(requireActivity(), R.menu.photos_grid_action_mode)
         animateStatusBarColorTo(R.color.primaryLightColor)
 
-        fab.animate()
-            .scaleX(0f)
-            .scaleY(0f)
-            .duration = 200
+        animateFabScale(0F)
     }
 
     private fun finishActionMode() {
@@ -154,9 +159,13 @@ class PhotosGridFragment : Fragment() {
         selectedItems = emptyList()
         photosAdapter.cancelMultiselect()
 
+        animateFabScale(1F)
+    }
+
+    private fun animateFabScale(@FloatRange(from = 0.0, to = 1.0) scale: Float) {
         fab.animate()
-            .scaleX(1f)
-            .scaleY(1f)
+            .scaleX(scale)
+            .scaleY(scale)
             .duration = 200
     }
 
@@ -203,6 +212,14 @@ class PhotosGridFragment : Fragment() {
             showEmptyState(true)
         } else {
             showEmptyState(false)
+            if (recyclerView.isEnabled.not()) {
+                progressBar.isVisible = false
+                animateFabScale(1F)
+                recyclerView.animate()
+                    .alpha(1F)
+                    .duration = 200
+                recyclerView.isEnabled = true
+            }
             photosAdapter.replaceItemsWith(photos.photos)
         }
     }
