@@ -34,6 +34,7 @@ class DetailFragment : Fragment() {
 
     private val args: DetailFragmentArgs by navArgs()
     private val photoId get() = PhotoId(args.rawId)
+    private var pendingMonochrome: Boolean = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         inflater.inflate(R.layout.fragment_details, container, false)!!
@@ -73,24 +74,32 @@ class DetailFragment : Fragment() {
     }
 
     private fun updateImageLabelView(photo: Photo, shouldAnimate: Boolean) {
-        if (photo.label != null) {
-            imageLabel.text = photo.label
-            imageLabel.isVisible = true
-
-            if (shouldAnimate) {
-                imageLabel.translationY = resources.getDimensionPixelSize(R.dimen.label_translation_y).toFloat()
-                imageLabel.alpha = 0f
-                imageLabel.animate().alpha(1f).translationY(0f)
-            }
-        } else {
+        if (photo.label == null) {
             imageLabel.isVisible = false
+            return
+        }
+
+        imageLabel.text = photo.label
+        imageLabel.isVisible = true
+
+        if (shouldAnimate) {
+            imageLabel.translationY = resources.getDimensionPixelSize(R.dimen.label_translation_y).toFloat()
+            imageLabel.alpha = 0f
+            imageLabel.animate().alpha(1f).translationY(0f)
         }
     }
 
     private fun loadImage(imageUrl: String) {
         Timber.d("Loading image $imageUrl...")
-        Picasso.get()
-            .load(imageUrl.toUri())
+        val imageUri = imageUrl.toUri()
+        val picasso = Picasso.get()
+
+        if (pendingMonochrome) {
+            picasso.invalidate(imageUri)
+            pendingMonochrome = false
+        }
+
+        picasso.load(imageUri)
             .fit()
             .centerInside()
             .error(R.drawable.broken_placeholder)
@@ -141,6 +150,7 @@ class DetailFragment : Fragment() {
                 if (result.isSuccess) {
                     Timber.i("Image $photoId desaturated successfully, reloading data.")
                     Snackbar.make(detailsRoot, "Image successfully converted to monochrome", Snackbar.LENGTH_SHORT).show()
+                    pendingMonochrome = true
                     loadImageData()
                 } else {
                     detailImage.animate().alpha(1f)
