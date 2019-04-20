@@ -11,6 +11,7 @@ import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
@@ -38,11 +39,16 @@ private val okHttpClient = OkHttpClient.Builder()
     }
     .build()
 
-const val BASE_URI = "https://cloud-kotlin-io19.appspot.com/"
-const val SHARE_BASE_URI = "https://20190417t135928-dot-cloud-kotlin-io19.appspot.com/"
+enum class Endpoint(val baseUrl: String) {
+    CRUD("https://cloud-kotlin-io19.appspot.com/"),
+    KTOR("https://ktor-dot-cloud-kotlin-io19.appspot.com/")
+}
 
-fun retrofit(): Retrofit = Retrofit.Builder()
-    .baseUrl(BASE_URI)
+fun crudRetrofit(): PhotosCrudBackend = retrofit(Endpoint.CRUD).create()
+fun ktorRetrofit(): PhotosKtorBackend = retrofit(Endpoint.KTOR).create()
+
+private fun retrofit(endpoint: Endpoint): Retrofit = Retrofit.Builder()
+    .baseUrl(endpoint.baseUrl)
     .client(okHttpClient)
     .addConverterFactory(GsonConverterFactory.create())
     .addCallAdapterFactory(LiveDataCallAdapterFactory)

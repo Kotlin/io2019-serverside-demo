@@ -11,7 +11,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.jetbrains.iogallery.ImagesViewModel
+import com.jetbrains.iogallery.PhotosCrudViewModel
+import com.jetbrains.iogallery.PhotosKtorViewModel
 import com.jetbrains.iogallery.R
 import com.jetbrains.iogallery.model.PhotoId
 import com.jetbrains.iogallery.support.requiredPhotoIdsFromRawStringArray
@@ -22,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class BatchOperationDialogFragment : BottomSheetDialogFragment() {
 
-    private lateinit var viewModel: ImagesViewModel
+    private lateinit var viewModel: PhotosCrudViewModel
 
     private val ids by requiredPhotoIdsFromRawStringArray(ARG_IDS)
     private val operationType: BatchOperationType by requiredSerializableArgument(ARG_OPERATION_TYPE)
@@ -37,12 +38,12 @@ class BatchOperationDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProviders.of(this).get(ImagesViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(PhotosCrudViewModel::class.java)
 
         pendingOperations.set(ids.count())
         when (operationType) {
             BatchOperationType.DELETE -> askConfirmationForBatchDelete()
-            BatchOperationType.BLACK_AND_WHITE -> makeImagesBlackAndWhite()
+            BatchOperationType.MONOCHROME -> makeImagesMonochrome()
         }
         cancelButton.setOnClickListener { dismiss() }
     }
@@ -83,15 +84,16 @@ class BatchOperationDialogFragment : BottomSheetDialogFragment() {
         onImageProcessed()
     }
 
-    private fun makeImagesBlackAndWhite() {
+    private fun makeImagesMonochrome() {
         isCancelable = false
         requireView().isEnabled = false
         hideDialogMessageViews()
         progressBar.isInvisible = false
 
+        val ktorViewModel = ViewModelProviders.of(this).get(PhotosKtorViewModel::class.java)
         ids.forEach { id ->
-            Timber.d("Converting image $id to B&W...")
-            viewModel.makeImageBlackAndWhite(id)
+            Timber.d("Converting image $id to monochrome...")
+            ktorViewModel.makeImageMonochrome(id)
                 .observe(this, Observer { result ->
                     if (result.isSuccess) {
                         onImageConverted(id)
@@ -146,12 +148,12 @@ class BatchOperationDialogFragment : BottomSheetDialogFragment() {
 
     private fun getErrorText(failedCount: Int) = when (operationType) {
         BatchOperationType.DELETE -> resources.getQuantityString(R.plurals.delete_result_blurb_error, failedCount, failedCount)
-        BatchOperationType.BLACK_AND_WHITE -> resources.getQuantityString(R.plurals.b_and_w_result_blurb_error, failedCount)
+        BatchOperationType.MONOCHROME -> resources.getQuantityString(R.plurals.b_and_w_result_blurb_error, failedCount)
     }
 
     private fun getSuccessText(imagesCount: Int) = when (operationType) {
         BatchOperationType.DELETE -> resources.getQuantityString(R.plurals.delete_result_blurb_success, imagesCount, imagesCount)
-        BatchOperationType.BLACK_AND_WHITE -> resources.getQuantityString(R.plurals.b_and_w_result_blurb_success, imagesCount)
+        BatchOperationType.MONOCHROME -> resources.getQuantityString(R.plurals.b_and_w_result_blurb_success, imagesCount)
     }
 
     private fun dismissAfterDelay() {

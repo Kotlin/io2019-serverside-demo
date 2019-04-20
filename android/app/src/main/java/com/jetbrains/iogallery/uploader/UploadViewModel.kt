@@ -10,7 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.jetbrains.iogallery.api.PhotosCrudBackend
 import com.jetbrains.iogallery.api.UploadException
-import com.jetbrains.iogallery.api.retrofit
+import com.jetbrains.iogallery.api.crudRetrofit
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -20,8 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class UploadViewModel : ViewModel() {
 
-    private val backend
-        get() = retrofit().create(PhotosCrudBackend::class.java)
+    private val backend by lazy { crudRetrofit() }
 
     fun uploadImages(contentResolver: ContentResolver, vararg imageUris: Uri): LiveData<UploadEvent> {
         val liveData = MediatorLiveData<UploadEvent>()

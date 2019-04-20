@@ -27,8 +27,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.google.android.material.animation.ArgbEvaluatorCompat
-import com.jetbrains.iogallery.ImagesViewModel
 import com.jetbrains.iogallery.MainActivity
+import com.jetbrains.iogallery.PhotosCrudViewModel
 import com.jetbrains.iogallery.R
 import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.model.Photos
@@ -41,7 +41,7 @@ import timber.log.Timber
 
 class PhotosGridFragment : Fragment() {
 
-    private lateinit var viewModel: ImagesViewModel
+    private lateinit var viewModel: PhotosCrudViewModel
 
     private val actionMode = PrimaryActionModeCallback()
     private var selectedItems: List<Photo> = emptyList()
@@ -64,7 +64,7 @@ class PhotosGridFragment : Fragment() {
         recyclerView.setHasFixedSize(true)
         recyclerView.addItemDecoration(MarginItemDecoraton(view.resources.getDimensionPixelSize(R.dimen.grid_images_margin)))
 
-        viewModel = ViewModelProviders.of(this).get(ImagesViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(PhotosCrudViewModel::class.java)
         viewModel.imageEntries.observe(this, Observer(::onImagesListChanged))
 
         setHasOptionsMenu(true)
@@ -98,7 +98,7 @@ class PhotosGridFragment : Fragment() {
     private fun onActionModeItemClicked(item: MenuItem) {
         when (item.itemId) {
             R.id.menu_delete -> startBatchOperation(BatchOperationType.DELETE)
-            R.id.menu_b_and_w -> startBatchOperation(BatchOperationType.BLACK_AND_WHITE)
+            R.id.menu_b_and_w -> startBatchOperation(BatchOperationType.MONOCHROME)
         }
     }
 

@@ -25,7 +25,7 @@ class PhotosAdapter(
     private var isMultiSelecting: Boolean = false
 
     init {
-        setHasStableIds(true)
+        setHasStableIds(false)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
