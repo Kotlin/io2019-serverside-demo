@@ -7,11 +7,10 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
-import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 
-interface ImagesBackend {
+interface PhotosCrudBackend {
 
     @GET("photos")
     fun fetchPhotosList(): LiveData<Result<ApiPhotos>>
@@ -22,7 +21,4 @@ interface ImagesBackend {
 
     @DELETE("image/{id}")
     fun deleteImage(@Path("id") id: String): LiveData<Result<Unit>>
-
-    @PUT("image/{id}/b-and-w")
-    fun makeImageBlackAndWhite(@Path("id") id: String): LiveData<Result<Unit>>
 }

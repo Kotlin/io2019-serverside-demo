@@ -5,7 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.jetbrains.iogallery.api.BASE_URI
-import com.jetbrains.iogallery.api.ImagesBackend
+import com.jetbrains.iogallery.api.PhotosCrudBackend
 import com.jetbrains.iogallery.api.retrofit
 import com.jetbrains.iogallery.model.ApiPhotos
 import com.jetbrains.iogallery.model.Photo
@@ -18,7 +18,7 @@ import timber.log.Timber
 class ImagesViewModel : ViewModel() {
 
     private val backend
-        get() = retrofit().create(ImagesBackend::class.java)
+        get() = retrofit().create(PhotosCrudBackend::class.java)
 
     private val imageEntriesMediator = MediatorLiveData<Result<ApiPhotos>>()
 

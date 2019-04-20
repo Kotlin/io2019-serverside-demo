@@ -8,7 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.jetbrains.iogallery.api.ImagesBackend
+import com.jetbrains.iogallery.api.PhotosCrudBackend
 import com.jetbrains.iogallery.api.UploadException
 import com.jetbrains.iogallery.api.retrofit
 import okhttp3.MediaType
@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class UploadViewModel : ViewModel() {
 
     private val backend
-        get() = retrofit().create(ImagesBackend::class.java)
+        get() = retrofit().create(PhotosCrudBackend::class.java)
 
     fun uploadImages(contentResolver: ContentResolver, vararg imageUris: Uri): LiveData<UploadEvent> {
         val liveData = MediatorLiveData<UploadEvent>()
@@ -59,7 +59,7 @@ class UploadViewModel : ViewModel() {
         return liveData
     }
 
-    private fun ImagesBackend.uploadImage(contentResolver: ContentResolver, uri: Uri): LiveData<Result<Unit>> {
+    private fun PhotosCrudBackend.uploadImage(contentResolver: ContentResolver, uri: Uri): LiveData<Result<Unit>> {
         val inputStream = contentResolver.openInputStream(uri)
             ?: return MutableLiveData<Result<Unit>>().also {
                 it.postValue(Result.failure(UploadException("Unable to access content at $uri")))
