@@ -1,9 +1,12 @@
 package com.jetbrains.ktorServer
 
+import com.google.cloud.datastore.DatastoreOptions
+import com.google.cloud.datastore.StructuredQuery
 import com.google.cloud.storage.BlobId
 import com.google.cloud.storage.BlobInfo
 import com.google.cloud.storage.StorageException
 import com.google.cloud.storage.StorageOptions
+import com.jetbrains.ktorServer.routes.Photo
 import io.ktor.application.ApplicationCall
 
 sealed class StorageResult {
@@ -34,3 +37,21 @@ fun ApplicationCall.saveToStorage(bucket: String, id: String, blob: ByteArray): 
         StorageResult.Failure(e.message ?: "Something went wrong")
     }
 }
+
+
+fun queryDataStore(unprocessed: Boolean = false): List<Photo> {
+    val dataStore = DatastoreOptions.getDefaultInstance().service
+    val queryBuilder = StructuredQuery.newEntityQueryBuilder()
+        .setKind("photo")
+    if (unprocessed) {
+        queryBuilder.setFilter(StructuredQuery.PropertyFilter.isNull("label"))
+    }
+    val query = queryBuilder.build()
+    val resultSet = dataStore.run(query)
+    val results = resultSet.asSequence().map {
+        Photo(it.getString("id"), it.getString("label") ?: "", it.getString("uri"))
+    }
+    return results.toList()
+}
+
+
