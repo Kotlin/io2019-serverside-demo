@@ -7,7 +7,7 @@
   <dimen name="image_label_text">16sp</dimen>
   <dimen name="image_label_elevation">5dp</dimen>
   <dimen name="image_label_drawablePadding">8dp</dimen>
-  <dimen name="image_label_marginBottom">72dp</dimen>
+  <dimen name="image_label_marginBottom">32dp</dimen>
   <dimen name="label_translation_y">8dp</dimen>
   <dimen name="dialog_margin_unit">16dp</dimen>
   <dimen name="grid_item_check_margin">4dp</dimen>
