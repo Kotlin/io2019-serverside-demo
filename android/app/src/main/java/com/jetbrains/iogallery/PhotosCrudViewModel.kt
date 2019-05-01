@@ -29,7 +29,7 @@ class PhotosCrudViewModel : ViewModel() {
             if (result.isSuccess) {
                 Photos(result.getOrThrow().embedded.photos
                     .map { apiPhoto ->
-                        val imageUrl = Endpoint.CRUD.baseUrl + apiPhoto.uri
+                        val imageUrl = "${Endpoint.CRUD.baseUrl}${apiPhoto.uri}".replace("//", "/")
                         val label = apiPhoto.label?.substringBefore(',')
                         Photo(PhotoId(apiPhoto.rawId), imageUrl, label)
                     }

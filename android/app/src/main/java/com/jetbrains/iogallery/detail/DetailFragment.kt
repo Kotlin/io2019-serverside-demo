@@ -1,6 +1,7 @@
 package com.jetbrains.iogallery.detail
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -22,6 +23,7 @@ import com.jetbrains.iogallery.R
 import com.jetbrains.iogallery.api.Endpoint
 import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.model.PhotoId
+import com.jetbrains.iogallery.support.nukePicassoCache
 import com.jetbrains.iogallery.support.provideViewModel
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -64,7 +66,7 @@ class DetailFragment : Fragment() {
         val shouldAnimateLabel = !imageLabel.isVisible
         updateImageLabelView(photo, shouldAnimateLabel)
 
-        loadImage(photo.imageUrl)
+        loadImage(photo.imageUrl.toUri())
     }
 
     private fun updateImageLabelView(photo: Photo, shouldAnimate: Boolean) {
@@ -83,13 +85,12 @@ class DetailFragment : Fragment() {
         }
     }
 
-    private fun loadImage(imageUrl: String) {
-        Timber.d("Loading image $imageUrl...")
-        val imageUri = imageUrl.toUri()
+    private fun loadImage(imageUri: Uri) {
+        Timber.d("Loading image $imageUri...")
         val picasso = Picasso.get()
 
         if (pendingMonochrome) {
-            picasso.invalidate(imageUri)
+            nukePicassoCache()
             pendingMonochrome = false
         }
 
@@ -100,7 +101,7 @@ class DetailFragment : Fragment() {
             .into(detailImage, object : Callback {
                 override fun onError(e: Exception?) {
                     progressBar.isVisible = false
-                    Timber.e(e, "Error loading: $imageUrl")
+                    Timber.e(e, "Error loading: $imageUri")
                     Snackbar.make(detailsRoot, "Error loading image", Snackbar.LENGTH_LONG).show()
                     detailImage.animate().alpha(1f)
                     findNavController().popBackStack()
@@ -109,7 +110,7 @@ class DetailFragment : Fragment() {
                 override fun onSuccess() {
                     detailImage.animate().alpha(1f)
                     progressBar.isVisible = false
-                    Timber.i("Image loaded: $imageUrl")
+                    Timber.i("Image loaded: $imageUri")
                 }
             })
     }
@@ -122,7 +123,7 @@ class DetailFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_delete -> onDeleteClicked(photoId)
-            R.id.menu_b_and_w -> onMonochromeClicked(photoId)
+            R.id.menu_monochrome -> onMonochromeClicked(photoId)
             R.id.menu_share -> onShareClicked(photoId)
             R.id.menu_refresh -> loadPhotoData()
             else -> return false

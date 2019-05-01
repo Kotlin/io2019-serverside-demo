@@ -37,6 +37,7 @@ import com.jetbrains.iogallery.photosgrid.batch.BatchOperationDialogFragment
 import com.jetbrains.iogallery.photosgrid.batch.BatchOperationType
 import com.jetbrains.iogallery.support.MarginItemDecorator
 import com.jetbrains.iogallery.support.PrimaryActionModeCallback
+import com.jetbrains.iogallery.support.nukePicassoCache
 import kotlinx.android.synthetic.main.fragment_photos_grid.*
 import timber.log.Timber
 
@@ -103,7 +104,7 @@ class PhotosGridFragment : Fragment() {
     private fun onActionModeItemClicked(item: MenuItem) {
         when (item.itemId) {
             R.id.menu_delete -> startBatchOperation(BatchOperationType.DELETE)
-            R.id.menu_b_and_w -> startBatchOperation(BatchOperationType.MONOCHROME)
+            R.id.menu_monochrome -> startBatchOperation(BatchOperationType.MONOCHROME)
         }
     }
 
@@ -117,7 +118,10 @@ class PhotosGridFragment : Fragment() {
         }
         val supportFragmentManager = requireActivity().supportFragmentManager
         dialog.showNow(supportFragmentManager, "BATCH")
-        dialog.onDismissListener = { loadImages(freshLoading = false) }
+        dialog.onDismissListener = {
+            nukePicassoCache()
+            loadImages(freshLoading = false)
+        }
     }
 
     private fun loadImages(freshLoading: Boolean) {
@@ -213,8 +217,10 @@ class PhotosGridFragment : Fragment() {
         progressBar.isVisible = false
         fab.isVisible = true
         if (photos.isEmpty) {
+            Timber.d("Images list has changed and is now empty")
             showEmptyState(true)
         } else {
+            Timber.d("Images list has changed, contains ${photos.photos.count()} image(s)")
             showEmptyState(false)
             if (recyclerView.isEnabled.not()) {
                 progressBar.isVisible = false
