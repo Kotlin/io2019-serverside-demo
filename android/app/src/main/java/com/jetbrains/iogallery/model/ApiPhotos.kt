@@ -44,7 +44,9 @@ data class ApiPhotos(
             @SerializedName("_links")
             val links: ApiLinks,
             @SerializedName("uri")
-            val uri: String
+            val uri: String,
+            @SerializedName("label")
+            val label: String
         ) {
 
             val rawId

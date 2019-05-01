@@ -30,7 +30,8 @@ class PhotosCrudViewModel : ViewModel() {
                 Photos(result.getOrThrow().embedded.photos
                     .map { apiPhoto ->
                         val imageUrl = Endpoint.CRUD.baseUrl + apiPhoto.uri
-                        Photo(PhotoId(apiPhoto.rawId), imageUrl)
+                        val label = apiPhoto.label.substringBefore(',')
+                        Photo(PhotoId(apiPhoto.rawId), imageUrl, label)
                     }
                 )
             } else {
