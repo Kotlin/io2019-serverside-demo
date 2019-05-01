@@ -42,6 +42,7 @@ class PrimaryActionModeCallback : ActionMode.Callback {
 
     fun startActionMode(activity: FragmentActivity, @MenuRes menuResId: Int) {
         this.menuResId = menuResId
+        selectedItemsCount = 1
         (activity as AppCompatActivity).startSupportActionMode(this)
     }
 
