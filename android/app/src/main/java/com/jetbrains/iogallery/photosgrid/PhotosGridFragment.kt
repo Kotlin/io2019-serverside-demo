@@ -35,7 +35,7 @@ import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.model.Photos
 import com.jetbrains.iogallery.photosgrid.batch.BatchOperationDialogFragment
 import com.jetbrains.iogallery.photosgrid.batch.BatchOperationType
-import com.jetbrains.iogallery.support.MarginItemDecoraton
+import com.jetbrains.iogallery.support.MarginItemDecorator
 import com.jetbrains.iogallery.support.PrimaryActionModeCallback
 import kotlinx.android.synthetic.main.fragment_photos_grid.*
 import timber.log.Timber
@@ -60,10 +60,14 @@ class PhotosGridFragment : Fragment() {
         actionMode.onActionItemClickListener = ::onActionModeItemClicked
         actionMode.onActionModeFinishedListener = ::finishActionMode
 
-        recyclerView.layoutManager = GridLayoutManager(view.context, 2).apply { orientation = VERTICAL }
+        val columnsCount = resources.getInteger(R.integer.columns_count)
+        recyclerView.layoutManager = GridLayoutManager(view.context, columnsCount)
+            .apply { orientation = VERTICAL }
         recyclerView.adapter = photosAdapter
         recyclerView.setHasFixedSize(true)
-        recyclerView.addItemDecoration(MarginItemDecoraton(view.resources.getDimensionPixelSize(R.dimen.grid_images_margin)))
+
+        val itemSpacing = view.resources.getDimensionPixelSize(R.dimen.grid_images_margin)
+        recyclerView.addItemDecoration(MarginItemDecorator(itemSpacing, columnsCount))
 
         viewModel = ViewModelProviders.of(this).get(PhotosCrudViewModel::class.java)
         viewModel.photos.observe(this, Observer(::onImagesListChanged))
@@ -224,11 +228,6 @@ class PhotosGridFragment : Fragment() {
         }
     }
 
-    private fun showEmptyState(visible: Boolean) {
-        emptyState.isVisible = visible
-        recyclerView.isVisible = !visible
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.photos_grid, menu)
     }
@@ -245,6 +244,8 @@ class PhotosGridFragment : Fragment() {
         val mainActivity = requireActivity() as MainActivity
         val menuItemView = mainActivity.menuItemViews().last()
 
+        showEmptyState(false)
+
         menuItemView.animate()
             .setInterpolator(FastOutSlowInInterpolator())
             .rotation(360F)
@@ -252,6 +253,11 @@ class PhotosGridFragment : Fragment() {
             .duration = 250
 
         loadImages(freshLoading = false)
+    }
+
+    private fun showEmptyState(visible: Boolean) {
+        emptyState.isVisible = visible
+        recyclerView.isVisible = !visible
     }
 }
 
