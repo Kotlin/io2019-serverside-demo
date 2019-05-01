@@ -24,7 +24,6 @@
     android:layout_height="@dimen/grid_item_check_size"
     android:layout_margin="@dimen/grid_item_check_margin"
     android:importantForAccessibility="no"
-    android:tint="@color/primaryDarkColor"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     app:srcCompat="@drawable/ic_check" />

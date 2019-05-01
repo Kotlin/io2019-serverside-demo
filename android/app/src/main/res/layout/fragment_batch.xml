@@ -81,7 +81,6 @@
     android:layout_height="64dp"
     android:layout_marginBottom="@dimen/dialog_margin_unit"
     android:importantForAccessibility="no"
-    android:tint="@color/primaryColor"
     app:layout_constraintTop_toTopOf="@+id/dialogTitle"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
