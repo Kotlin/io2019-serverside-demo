@@ -52,12 +52,6 @@ class DetailFragment : Fragment() {
         loadPhotoData()
     }
 
-    private fun loadPhotoData() {
-        Timber.d("Loading photo data...")
-        progressBar.isVisible = true
-        photoDetailCrudViewModel.fetchPhoto()
-    }
-
     private fun onPhotoDataChanged(photo: Photo?) {
         if (photo == null) {
             detailImage.setImageResource(R.drawable.ic_error)
@@ -67,8 +61,8 @@ class DetailFragment : Fragment() {
             return
         }
 
-        val shouldAnimate = !imageLabel.isVisible
-        updateImageLabelView(photo, shouldAnimate)
+        val shouldAnimateLabel = !imageLabel.isVisible
+        updateImageLabelView(photo, shouldAnimateLabel)
 
         loadImage(photo.imageUrl)
     }
@@ -108,6 +102,7 @@ class DetailFragment : Fragment() {
                     progressBar.isVisible = false
                     Timber.e(e, "Error loading: $imageUrl")
                     Snackbar.make(detailsRoot, "Error loading image", Snackbar.LENGTH_LONG).show()
+                    detailImage.animate().alpha(1f)
                     findNavController().popBackStack()
                 }
 
@@ -129,6 +124,7 @@ class DetailFragment : Fragment() {
             R.id.menu_delete -> onDeleteClicked(photoId)
             R.id.menu_b_and_w -> onMonochromeClicked(photoId)
             R.id.menu_share -> onShareClicked(photoId)
+            R.id.menu_refresh -> loadPhotoData()
             else -> return false
         }
         return super.onOptionsItemSelected(item)
@@ -167,5 +163,12 @@ class DetailFragment : Fragment() {
             type = "text/plain"
         }
         requireActivity().startActivity(Intent.createChooser(intent, resources.getText(R.string.send_to)))
+    }
+
+    private fun loadPhotoData() {
+        Timber.d("Loading photo data...")
+        progressBar.isVisible = true
+        detailImage.animate().alpha(.75f)
+        photoDetailCrudViewModel.fetchPhoto()
     }
 }
