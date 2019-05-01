@@ -66,7 +66,7 @@ class PhotosGridFragment : Fragment() {
         recyclerView.addItemDecoration(MarginItemDecoraton(view.resources.getDimensionPixelSize(R.dimen.grid_images_margin)))
 
         viewModel = ViewModelProviders.of(this).get(PhotosCrudViewModel::class.java)
-        viewModel.imageEntries.observe(this, Observer(::onImagesListChanged))
+        viewModel.photos.observe(this, Observer(::onImagesListChanged))
 
         setHasOptionsMenu(true)
 
@@ -130,7 +130,7 @@ class PhotosGridFragment : Fragment() {
                 .duration = 200
             recyclerView.isEnabled = false
         }
-        viewModel.fetchImageEntries()
+        viewModel.fetchPhotos()
     }
 
     private fun onItemMultiselectChanged(newSelectedItems: List<Photo>) {

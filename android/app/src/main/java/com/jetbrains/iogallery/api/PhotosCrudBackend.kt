@@ -2,6 +2,7 @@ package com.jetbrains.iogallery.api
 
 import androidx.lifecycle.LiveData
 import com.jetbrains.iogallery.model.ApiPhotos
+import com.jetbrains.iogallery.model.ApiPhotos.ApiEmbedded.ApiPhoto
 import okhttp3.MultipartBody
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -13,7 +14,10 @@ import retrofit2.http.Path
 interface PhotosCrudBackend {
 
     @GET("photos")
-    fun fetchPhotosList(): LiveData<Result<ApiPhotos>>
+    fun photosList(): LiveData<Result<ApiPhotos>>
+
+    @GET("photos/{id}")
+    fun photo(@Path("id") id: String): LiveData<Result<ApiPhoto>>
 
     @Multipart
     @POST("upload")

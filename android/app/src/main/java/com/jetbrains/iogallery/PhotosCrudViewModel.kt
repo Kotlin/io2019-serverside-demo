@@ -18,13 +18,13 @@ class PhotosCrudViewModel : ViewModel() {
 
     private val backend by lazy { crudRetrofit() }
 
-    private val imageEntriesMediator = MediatorLiveData<Result<ApiPhotos>>()
+    private val photosMediator = MediatorLiveData<Result<ApiPhotos>>()
 
-    private var currentImageEntriesSource: LiveData<Result<ApiPhotos>> = MutableLiveData<Result<ApiPhotos>>().also {
+    private var currentPhotosSource: LiveData<Result<ApiPhotos>> = MutableLiveData<Result<ApiPhotos>>().also {
         it.value = Result.success(ApiPhotos.EMPTY) // Initial value
     }
 
-    val imageEntries = imageEntriesMediator.toKtx()
+    val photos = photosMediator.toKtx()
         .map { result ->
             if (result.isSuccess) {
                 Photos(result.getOrThrow().embedded.photos
@@ -39,15 +39,15 @@ class PhotosCrudViewModel : ViewModel() {
             }
         }
 
-    fun fetchImageEntries() {
-        Timber.i("Fetching images list...")
-        imageEntriesMediator.removeSource(currentImageEntriesSource)
+    fun fetchPhotos() {
+        Timber.i("Fetching photos list...")
+        photosMediator.removeSource(currentPhotosSource)
 
         // TODO: handle in-flight and error states properly
-        currentImageEntriesSource = backend.fetchPhotosList()
+        currentPhotosSource = backend.photosList()
 
-        imageEntriesMediator.addSource(currentImageEntriesSource) {
-            imageEntriesMediator.postValue(it)
+        photosMediator.addSource(currentPhotosSource) {
+            photosMediator.postValue(it)
         }
     }
 

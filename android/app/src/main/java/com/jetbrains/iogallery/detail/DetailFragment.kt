@@ -22,7 +22,7 @@ import com.jetbrains.iogallery.R
 import com.jetbrains.iogallery.api.Endpoint
 import com.jetbrains.iogallery.model.Photo
 import com.jetbrains.iogallery.model.PhotoId
-import com.jetbrains.iogallery.model.Photos
+import com.jetbrains.iogallery.support.provideViewModel
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_details.*
@@ -30,7 +30,8 @@ import timber.log.Timber
 
 class DetailFragment : Fragment() {
 
-    private lateinit var crudViewModel: PhotosCrudViewModel
+    private lateinit var photosCrudViewModel: PhotosCrudViewModel
+    private lateinit var photoDetailCrudViewModel: PhotoDetailCrudViewModel
 
     private val args: DetailFragmentArgs by navArgs()
     private val photoId get() = PhotoId(args.rawId)
@@ -44,28 +45,27 @@ class DetailFragment : Fragment() {
 
         setHasOptionsMenu(true)
 
-        crudViewModel = ViewModelProviders.of(this).get(PhotosCrudViewModel::class.java)
+        photosCrudViewModel = provideViewModel()
+        photoDetailCrudViewModel = provideViewModel { PhotoDetailCrudViewModel(photoId) }
 
-        crudViewModel.imageEntries.observe(this, Observer(::onImagesListChanged))
-        loadImageData()
+        photoDetailCrudViewModel.photo.observe(this, Observer(::onPhotoDataChanged))
+        loadPhotoData()
     }
 
-    private fun loadImageData() {
-        Timber.d("Loading images list...")
+    private fun loadPhotoData() {
+        Timber.d("Loading photo data...")
         progressBar.isVisible = true
-        crudViewModel.fetchImageEntries()
+        photoDetailCrudViewModel.fetchPhoto()
     }
 
-    private fun onImagesListChanged(photos: Photos) {
-        if (photos.isEmpty) {
+    private fun onPhotoDataChanged(photo: Photo?) {
+        if (photo == null) {
             detailImage.setImageResource(R.drawable.ic_error)
             imageLabel.isVisible = false
-            Snackbar.make(detailImage, "Could not load the image.", Snackbar.LENGTH_INDEFINITE)
-                .setAction("Retry") { loadImageData() }
+            Snackbar.make(detailImage, "Could not load the photo.", Snackbar.LENGTH_INDEFINITE)
+                .setAction("Retry") { loadPhotoData() }
             return
         }
-
-        val photo = photos[photoId]
 
         val shouldAnimate = !imageLabel.isVisible
         updateImageLabelView(photo, shouldAnimate)
@@ -151,7 +151,7 @@ class DetailFragment : Fragment() {
                     Timber.i("Image $photoId desaturated successfully, reloading data.")
                     Snackbar.make(detailsRoot, "Image successfully converted to monochrome", Snackbar.LENGTH_SHORT).show()
                     pendingMonochrome = true
-                    loadImageData()
+                    loadPhotoData()
                 } else {
                     detailImage.animate().alpha(1f)
                     val errorMessage = "Error while hipstering image"
