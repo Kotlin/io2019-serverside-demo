@@ -10,7 +10,6 @@
     android:id="@+id/recyclerView"
     android:layout_width="@dimen/match_constraints"
     android:layout_height="@dimen/match_constraints"
-    android:paddingRight="@dimen/grid_images_margin"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintEnd_toEndOf="parent"

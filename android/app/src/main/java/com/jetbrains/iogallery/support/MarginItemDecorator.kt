@@ -9,10 +9,10 @@ class MarginItemDecorator(private val itemSpacing: Int, private val columnsCount
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         val position = parent.getChildAdapterPosition(view)
         outRect.apply {
-            top = itemSpacing
             left = itemSpacing
-            right = 0
-            bottom = if (position >= parent.adapter!!.itemCount - columnsCount) itemSpacing else 0
+            top = if (position < columnsCount) itemSpacing else 0
+            right = if (position % columnsCount != 0) itemSpacing else 0
+            bottom = itemSpacing
         }
     }
 }
