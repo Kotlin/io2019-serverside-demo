@@ -28,7 +28,7 @@ class PhotoDetailCrudViewModel(private val id: PhotoId) : ViewModel() {
             if (result.isSuccess) {
                 val apiPhoto = result.getOrThrow()
                 val imageUrl = Endpoint.CRUD.baseUrl + apiPhoto.uri
-                val label = apiPhoto.label.substringBefore(',')
+                val label = apiPhoto.label?.substringBefore(',')
                 Photo(PhotoId(apiPhoto.rawId), imageUrl, label)
             } else {
                 null

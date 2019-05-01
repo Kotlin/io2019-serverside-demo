@@ -46,7 +46,7 @@ data class ApiPhotos(
             @SerializedName("uri")
             val uri: String,
             @SerializedName("label")
-            val label: String
+            val label: String?
         ) {
 
             val rawId
