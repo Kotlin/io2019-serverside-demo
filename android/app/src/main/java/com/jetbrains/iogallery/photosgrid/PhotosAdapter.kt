@@ -35,7 +35,7 @@ class PhotosAdapter(
 
     override fun getItemCount() = items.count()
 
-    // TODO: you should NEVER use hashcode as an item ID — clashes are too likely and it's very risky to do.
+    // Note: you should NEVER use hashcode as an item ID — clashes are too likely and it's very risky to do.
     // You could get crashes (stableIDs must be unique)! In this case we're ok with it because there's a low
     // amount of items, and all of them have UUIDs, which makes the risk of clashes low (but not zero)
     override fun getItemId(position: Int) = items[position].item.id.hashCode().toLong()
