@@ -117,14 +117,16 @@ class DetailFragment : Fragment() {
     }
 
     private fun invalidateOptionsMenu() {
-        // This is a silly hack but for whatever reason Fragment doesn't have a real API for this
-        setHasOptionsMenu(false)
-        setHasOptionsMenu(true)
+        requireActivity().invalidateOptionsMenu()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.details, menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
 
         val enabled = detailImage.drawable != null
         listOf(R.id.menu_monochrome, R.id.menu_refresh).forEach { menuId ->

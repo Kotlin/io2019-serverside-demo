@@ -258,6 +258,8 @@ class PhotosGridFragment : Fragment() {
             .withEndAction { menuItemView.rotation = 0F }
             .duration = 250
 
+        nukePicassoCache()
+
         loadImages(freshLoading = false)
     }
 
